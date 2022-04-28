@@ -1,0 +1,175 @@
+GIT FLOW USER MANUAL
+------------------------------------------------------------------------
+DESCRIPTION : 
+
+	**GIT FLOW is a methodology , a "good practices" way of using GIT.
+	**GITFLOW involves the use of feature branches and multiple primary branches.
+	**A feature branch is created and delayed merging to master until the feature 
+	  is completed
+	
+	
+	
+------------------------------------------------------------------------
+
+KEY CONCEPTS:
+	
+	**One of GITFLOW main concept is the existance of a MASTER/MAIN and a DEVELOP/STAGING branch
+	so 2 main branches in total.
+	
+	**MAIN/MASTER stores the official release 
+	**RELEASE stores the latest release
+	**DEVELOP/STAGING works as integration of features branch
+	**COMMITS in the MAIN branch are always tagged with a version tag
+	
+	
+	main:
+	-------------------->
+	release
+	-------------------->
+	develop:
+	-------------------->
+	
+	**develop is used to add new features for the app. **merges into release
+	**release is production ready and only bugfixes can be added to this branch. **merges into main
+	**main contains the latest stable release. Each commit is always tagged with a version name
+
+---------------------------------------------------------------------------------------
+
+SUPPORT BRANCHES:
+
+	#FEATURE BRANCH:
+		
+		**Uses DEVELOP as PARENT branch
+		**All new features for our app will be implemented and tested in feature
+		**Once the new feature is finished and tested it is merged into develop
+		**Feature branches are created of the latest develop branch
+		**Once develop has enough features for release is merged into RELEASE
+
+		release:
+		------------------------>
+				|
+	develop:		|
+	-------------------------->
+	  	|		|
+		|_____Feature--|	
+		
+		In order to create a new feature branch: 
+		
+		**checkout -b feature_branch
+		
+		or
+		
+		**checkout -b feature/developer_name
+		
+		To merge feature into develop:
+		1)git checkout develop
+		2 git merge feature/developer_name
+		
+	#RELEASE BRANCH
+		
+		**Using a dedicated branch to prepare releases makes it 
+		possible for one team to polish the current release while 
+		another team continues working on features for the next release
+		**RELEASE is mergen into MAIN
+		**Uses DEVELOP as parent
+		
+		In order to create a release branch:
+			
+		git checkout -b release/<version>
+		
+		example:
+			git checkout -b release/1.0.0
+			
+		In order to merge RELEASE INTO MAIN:
+		
+		git checkout main
+		git merge release/1.0.0
+		
+			main:
+			----------------------->
+				   |
+		release:	   |
+		------------------------>
+				|
+	develop:		|
+	-------------------------->
+	  	|		| |
+		|_____Feature1--||
+		|_____Feature2--||
+		 |_____Feature3--|
+				
+	#HOTFIX BRANCH
+		
+		**Branch used for maintanance or "hotfix"
+		**Branch used to patch errors and bugs
+		**This branch is only used to patch errors in MAIN
+		**HOTFIX has MAIN has PARENT
+
+			main:
+			----------------------------->
+				   |   |___Hotfix__|
+		release:	   |
+		------------------------>
+				|
+	develop:		|
+	-------------------------->
+	  
+		**In order to create a hotfix branch:
+		
+		git checkout -b hotfix_branch
+		
+		**Merge hotfix branch:
+		**Notice the hotfix branch is deleted afterwards
+		
+		git checkout main
+		git merge hotfix_branch
+		git branch -D hotfix_branch
+		
+-------------------------------------------------------------------------------
+	
+TAGING COMMITS:
+
+	In order to tag commits in MAIN the following semantic is recomended:
+	
+	V<major>.<minow>.<path>
+	
+	**Define version tag example:
+		
+		git tag v1.0.0
+	
+	**Push version with tag:
+	
+		git push --tags
+		
+DISPLAY INFO:
+
+
+	git log
+	
+	** for more precise info
+	git log --oneline  
+	
+	
+SET APP PASSWORD
+
+	App password can be used as a regular password for  our 
+	local git repository to be able to make push/pulls/clone 
+	from our remote repository.
+	
+	Once the app password is defined in our user settings in the
+	case of BITBUCKED we can configure our local repo to use such password 
+	in the following way:
+	
+	https://USERNAME:APP_PASSWORD@bitbucket.org/username/reposlug.git
+	
+	example:
+	
+		git remote set-url origin https://USERNAME:APP_PASSWORD@bitbucket.org/username/reposlug.git
+		or
+		git clone https://USERNAME:APP_PASSWORD@bitbucket.org/username/reposlug.git
+	
+	example:
+		git remote set-url origin https://duftcola-bucket:APP_PASSWORD@bitbucket.org/duftcola-bucket/authtentication_server.git
+		
+	**notice this configuration only needs to be done once.
+		

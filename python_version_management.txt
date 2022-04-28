@@ -1,0 +1,28 @@
+Switching python versions
+To install a new Python version use :
+	
+	example :
+	
+	sudo add-apt-repository ppa:deadsnakes/ppa
+	sudo apt-get update
+	sudo apt-get install python3.7
+
+
+1) Create links to each of the python versions installed in your system with the following command:
+
+	sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.7 0 
+	
+	**This instruction links the selected python version (3.8) to the allias python 
+   	  for your entire system. Notice you need to provide an index at the end of each
+   	  instruction representing priorety
+   	  
+2) Add more version :
+
+	sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 
+	
+	sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.9 2
+	
+	
+3) Access the configuration of the group python and selects the desired python version:
+
+	sudo update-alternatives --config python 

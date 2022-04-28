@@ -1,0 +1,268 @@
+INSTALLATION 
+
+    create a venv 
+    install using pip :
+        fastapi
+        pydantic
+        uvicorn>[standard]
+    activate your venv 
+    run :
+        uvicorn main:app --reload
+
+---------------------------------------------------------
+
+BASIC APP 
+
+    from typing import Optional
+    from fastapi import FastAPI
+
+    app = FastAPI()
+
+
+    @app.get("/")
+    async def read_root():
+        return {"Hello": "World"}
+
+TESTING and api  documentation
+    ** user the following url lunch an api test enviroment
+    http://127.0.0.1:8000/docs.
+
+---------------------------------------------------------------------------------
+
+PATH 
+
+    #basic path 
+    @app.get("/user")
+    async def get_user():
+
+        return "something"
+
+    #path with parameters 
+    @app.get("/user/{id}")
+    async def get_user(id:str):
+
+        return f"user_id{id}"
+
+    ** adding type to parameters adds type check functionality by default --> id:str
+    ** the funciton will always check the id param is type str
+
+-----------------------------------------------------------------------------------------------------------
+
+PATH + MODELS  # models are custom datatypes or schemes used to enforce structures in request and responses
+
+
+    example 
+
+    from enum import Enum 
+
+    class ModelNames(str,Enum):
+
+        robin = "robin"
+        ruth = "ruth"
+        something = "somthing"
+
+    @app.get("user/{model_name}")
+    async def get_name(model_name : ModelNames): 
+        if model_name == ModelNames.robin:
+            reuturn {"name":ModelNames.robin}
+
+    ** this will enforce the request param be the type ModelNames
+
+---------------------------------------------------------------------------
+
+PATH + QUERY PARAMS
+
+** example of a request with query parameters
+ 
+    @app.get("/items/")
+    async def get_items(item:int , limit:int =10):
+        return  {"items":item, "limit":limit}
+
+        **params not declared in the path are automatically intrepreted as query params
+        ** you can user path and query params at the same time fastapi knows which is which
+        ** the the param has a default value like limit:int = 10  the is and optional param
+        ** if not is a required param like item
+
+example:
+
+    @app.get("/items/{user}")
+    async def get_items(item:int ,user, limit:int =10):
+        return  {"items":item, "limit":limit,"user":user}
+
+-------------------------------------------------------------------------------------------------
+
+PATH + BODY PARAMS  
+
+    from pydantic import BaseModel
+
+    class item(BaseModel):
+        name : str
+        description: Optional [str] = None
+        price : float  
+        tax: float
+
+    @app.post("/items/")
+    async def create_item(item:item):
+        return item
+
+    ** params are taken from the body automatically with post request
+    ** the request spects the params enfoced by the item model
+
+PATH + BODY PARAMS VALiDATION
+
+    from pydantic import BaseModel,field
+
+        class item(BaseModel):
+            name : str
+            description: Optional [str] = Field(None,title = "description of item" , max_lengh = 100)
+            price : float  
+            tax: float
+
+            ** param description will be check to have a max lenght of 100 chars
+
+        @app.post("/items/")
+        async def create_item(item:item):
+            return item
+
+
+PATH + BODY PARAMS  + NESTED MODLES
+
+    from typing import List, Optional
+    from fastapi import FastAPI
+    from pydantic import BaseModel
+
+    class Image(BaseModel):
+        url: str
+        name: str
+
+    class Item(BaseModel):
+        name: str
+        description: Optional[str] = None
+        price: float
+        tax: Optional[float] = None
+        tags: List[str] = []
+        tags_2 : Set[str] = set()
+        image: Image = None
+
+    ** List is a model nested within a model
+
+    @app.put("/items/{item_id}")
+    async def update_item(item_id: int, item: Item):
+        results = {"item_id": item_id, "item": item}
+        return results
+
+------------------------------------------------------------------- 
+
+DEFINE SPECTED SCHEMAS
+
+    class Item(BaseModel):
+        name: str
+        description: Optional[str] = None
+        price: float
+        tax: Optional[float] = None
+        class Config:
+            schema_extra = {
+                "example": {
+                    "name": "Foo",
+                    "description": "A very nice Item",
+                    "price": 35.4,
+                    "tax": 3.2,
+                }
+            }
+
+            ** schema_extra defines how the information of the request must be structured
+            ** you add different options of incoming data with the key workd "examples" :
+
+    class Item(BaseModel):
+        name: str
+        description: Optional[str] = None
+        price: float
+        tax: Optional[float] = None
+        class Config:
+            examples={
+            "normal": {
+                "summary": "A normal example",
+                "description": "A **normal** item works correctly.",
+                "value": {
+                    "name": "Foo",
+                    "description": "A very nice Item",
+                    "price": 35.4,
+                    "tax": 3.2,
+                },
+            },
+            "converted": {
+                "summary": "An example with converted data",
+                "description": "FastAPI can convert price `strings` to actual `numbers` automatically",
+                "value": {
+                    "name": "Bar",
+                    "price": "35.4",
+                },
+            },
+
+
+    @app.put("/items/{item_id}")
+    async def update_item(item_id: int, item: Item):
+        results = {"item_id": item_id, "item": item}
+        return results
+
+
+-----------------------------------------------------------
+
+GET HEADER DATA 
+
+    from fastapi import FastAPI ,Header 
+    @app.get("/items/")
+    async def read_items(headers: Optional[str] = Header(None)):
+        return {"User-Agent": headers}
+
+    ** this will add all the header parameters to the param headers
+
+--------------------------------------------------------------------------
+
+RESPONSE MODEL
+
+    Declaring models used for the response
+
+    from pydantic import BaseModel
+
+    class OutputModel(BaseModel)
+        name:str
+        description: Optional[str] = None 
+        price: float 
+        tax: Optional
+        tags: list[str] = []
+
+    class InputModel(BaseModel)  **respone model
+        name:str
+        description: Optional[str] = None 
+
+    example:
+
+    item = {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2}
+    
+    @app.post("/items/",response_model=OutputModel)
+    async def create_item(item:InputModel):
+        return item
+
+
+    **It is possible to have only one big model
+    and select from it only the parameters you want or
+    exclude only certain parameters with 
+
+        *response_model_include={}
+        *response_model_exclude={}
+
+    example:
+
+    @app.get("/items/{item_id}/public", response_model=Item, response_model_exclude={"tax"})
+    async def read_item_public_data(item_id: str):
+        return items[item_id]
+
+    ** this will exclude the param tax from your response
+
+    @app.get("/items/{item_id}/name",response_model=Item,response_model_include={"name", "description"},)
+        async def read_item_name(item_id: str):
+            return items[item_id]
+
+    ** this will only use the params "name" and "description" from your model
+    in the response
