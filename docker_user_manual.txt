@@ -196,6 +196,19 @@ There are 2 types of docker volumes :
 		**/*.pycache  **exclude all files that end with '.pycache'
 		*.md   ** exclude files that en with .md
 		!README.md **except this .md file
+
+-------------------------------------------------------------------------------------------
+
+#Debugging docker container
+
+	Basic debbuging :
+
+		docker logs <container_name>
+		or 
+		docker logs <container_id>
+	
+	
+
 --------------------------------------------------------------------------------------------
 
 #Creating a private repository for Docker in AWS ECR (elastic container registry)
