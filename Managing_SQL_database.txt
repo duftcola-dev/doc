@@ -10,3 +10,7 @@ UPDATE / FILL DATABASE
         4) start import 
         ** this is a higly intestense RAM use operation
 
+DATABASE MIGRATION
+
+    **I migration consist in move (migrate) the data from 
+    a source database to a target database.
