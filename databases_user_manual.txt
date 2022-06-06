@@ -382,6 +382,7 @@ SQLITE3
     sqlite3 flaskdb.db ".read init.sql"
     
     **were init.sql is a file with sql instructions
+    
 
 # SQLITE CONSOLE COMMANDS 
 
@@ -453,3 +454,21 @@ sqlite> .help
 .vfsname ?AUX?           Print the name of the VFS stack
 .width NUM1 NUM2 ...     Set minimum column widths for columnar output
 sqlite>
+
+# CREATING DATABASE / OPERATIONS 
+
+    - CREATE TABLES 
+
+    DROP TABLE Test;
+
+    CREATE TABLE Test (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            user TEXT NOT NULL UNIQUE
+    );
+
+    ** Notice sqlite3 uses AUTOINCREMENT while mysql uses AUTO_INCREMENT
+    ** Notice sqlite3 requires to use PRIMARY KEY with AUTOINCREMENTv in the same line
+    
+    INSERT INTO Test (user) VALUES ('Ronald');
+    INSERT INTO Test (user) VALUES ('Bill');
+    INSERT INTO Test (user) VALUES ('Bob');

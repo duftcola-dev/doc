@@ -1,0 +1,75 @@
+HOW TO SYNC TWO GIT REPOSITORIES
+The basis of this is git so it should work on Github and bitbucked
+
+1) Create a repository
+	
+	** lets assume the current folder is RepoA
+	git init 
+
+2) Add remote origin for the current repository
+
+	git remote add origin <url_here> 
+	
+3) Commit initial changes
+
+	git add --all
+	git commit -m "something something"
+	
+	
+4) Specify the new repository that will by synchronized 
+
+	git remote add upstream <url_here> 
+	
+	example :
+		
+		RepoA is our current local repository 
+		RepoB is the "other" remote repo we want to sync with 
+		
+		git remote add RepoB <url>
+	
+5) Check the new repository is exists in your fork 
+
+	git remote -v
+	
+	**It should output somthing like this 
+	RepoB   https://github.com/duftcola-dev/RepoB.git (fetch)
+	RepoB   https://github.com/duftcola-dev/RepoB.git (push)
+	origin  https://github.com/duftcola-dev/RepoA.git (fetch)
+	origin  https://github.com/duftcola-dev/RepoA.git (push)
+	
+6) Check the branches and commits from the upstream / Sync repositories 
+	
+	** from RepoA
+	git fetch RepoB
+	**This will create a detached head .
+	**Changes in this state will not affect other branches
+	**You can use switch to change to the new branch 
+		git switch -c RepoB/master
+	
+		git switch - ** to go back to master
+		
+	
+	**However we dont want to switch to RepoB/master
+	**We want to merge the cahnges of certain files into local master
+	   
+		git checkout --patch branch_name   folder/file_name.somtehing
+		
+	Example :
+	
+		** from local branch master 
+		git checkout --patch RepoB/master ./prefect.sh
+		
+		** This command will ask for you permission in the following way :
+		\ No newline at end of file
+		(1/1) Apply this hunk to index and worktree [y,n,q,a,d,e,?]? ** reponse with y (yes)
+		
+	WARNING :
+		*File that need to be merged should be in the same location
+		*Do not checkout nor create a branch with the detached head name!
+		git branch RepoB/master  *** DONT DO THIS UNDER ANY CIRCUNSTANCE !!! It wilRepol fuck everyting***
+		**All changes should be sync from branch mastergit 
+
+Second approach git switch --orphan temp
+  
+ 
+ 
