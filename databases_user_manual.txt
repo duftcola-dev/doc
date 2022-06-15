@@ -353,7 +353,44 @@ services:
 
 MYSQL
 
-# HOW TO USER MYSQL
+# MYSQL LOCAL INSTALLATION (LINUX UBUNTU)
+
+    # Installation 
+
+        sudo apt update 
+        sudo apt upgrade
+        sudo at install mysql-server
+
+        ** check the installation worked by 
+
+        mysql-version
+
+        ** output --> mysql VER 8.0.25 
+
+    # Additional database security functionalities
+    ** Once the basic mysql server is installed it is
+    necessary to install additional security features 
+    to create users and  manage permissions
+
+    **First change the authentication parameters 
+    for the root user 
+
+        sudo mysql
+
+        ALTER USER 'root'@'localhost' IDENTIFIED WITH 
+        mysql_native_password by 'mynewpassword';
+
+        **Where mynewpassword is the password the root user will use
+    
+    **Now proceed with the installation with the secure features
+
+        sudo mysql_secure_installation
+
+    **Proceed with installation steps
+    
+
+
+# HOW TO USER MYSQL WITH DOCKER
 
     *open mysql shell in the docker container
         -   docker exec -it <container_name> bash
