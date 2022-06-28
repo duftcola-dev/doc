@@ -387,10 +387,51 @@ MYSQL
         sudo mysql_secure_installation
 
     **Proceed with installation steps
-    
+
+# ENTER MYSQL CLI
+
+    ** -u stands for user , -p stands for requesting for password 
+    mysql -u user_name -p 
 
 
-# HOW TO USER MYSQL WITH DOCKER
+# CHANGE PASSWORD POLICY RULES
+
+    **in mysql cli
+        SHOW VARIABLES LIKE 'validate_password%';
+        SET GLOBAL validate_password.policy=LOW;
+        SET GLOBAL validate_password.length=0;
+        
+    **These changes are not permant and are only meant to be used once
+    ** Now you can create whatever user you want with any
+    password
+
+    ** To check the current list of users :
+    SELECT user,host FROM mysql.user;
+       
+
+# ADDING NEW USERS
+
+        CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
+
+
+# CREATING DB
+
+        CREATE DATABASE DB_database_name
+
+        **to delete it 
+        DROP database DB_employees
+
+        ** select the created database
+        use DB_employees
+
+        **once selected a database
+        use 'source' command to select a .sql to import a fully build database
+        **This method is usefull to import large data volumes
+        
+        source  /home/dutfcola-dev/Downloads/employees-db/dbEmployees.sql
+
+
+# HOW TO USE MYSQL WITH DOCKER
 
     *open mysql shell in the docker container
         -   docker exec -it <container_name> bash
