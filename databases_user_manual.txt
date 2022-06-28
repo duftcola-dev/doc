@@ -414,7 +414,7 @@ MYSQL
         CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
 
 
-# CREATING DB
+# CREATING/IMPORTING A DATABASE
 
         CREATE DATABASE DB_database_name
 
@@ -430,6 +430,32 @@ MYSQL
         
         source  /home/dutfcola-dev/Downloads/employees-db/dbEmployees.sql
 
+        **There is a second way of executing this option for creating a database.
+
+            - create a schema in mysql (from workbench or terminal)
+            - now from outside of the cli execute :
+
+                mysql -u root -p schema_created < url_to_file.sql
+
+# EXPORT A DATABASE
+
+        Run the command from terminal :
+
+            mysqldump -u root -p name_of_schema > /url/folder/url_to_file/file.sql
+
+# EXPORT/IMPORT A SINGLE TABLE 
+
+        **Run command 
+        **export
+        mysqldump -h localhost -u root -p schema_name table_name > tablem_name.sql
+
+        **import ** this only works if the .sql contains an exported table
+        mysql -h localhost -u root -p schema_name < tablem_name.sql
+
+
+# SQL QUERIES
+
+
 
 # HOW TO USE MYSQL WITH DOCKER
 
@@ -443,6 +469,8 @@ MYSQL
 
 ** for additional docuemtnation about instructions and commands consult mysql documentation
     in w3shcool.com
+
+
 
 -------------------------------------------------------------------------------
 
