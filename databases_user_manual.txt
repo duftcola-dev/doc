@@ -414,12 +414,21 @@ MYSQL
         CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
 
 
+# GRANTING ACCESS TO SCHEMA TO A USER
+
+    **as root :
+
+    GRANT permission permissions_type, , ,  ON SCHEMA schema_name
+
+
 # CREATING/IMPORTING A DATABASE
 
-        CREATE DATABASE DB_database_name
+        CREATE DATABASE IF NOT EXISTS DB_database_name
 
         **to delete it 
         DROP database DB_employees
+        or
+        DROP database IF EXISTS DB_employees 
 
         ** select the created database
         use DB_employees
@@ -436,6 +445,8 @@ MYSQL
             - now from outside of the cli execute :
 
                 mysql -u root -p schema_created < url_to_file.sql
+
+
 
 # EXPORT A DATABASE
 
@@ -454,6 +465,134 @@ MYSQL
 
 
 # SQL QUERIES
+
+    **We have 4 main categories of queries :
+
+        DDL **data definision
+            - CREATE
+            - ALTER
+            - DROP
+            - TRUNCATE
+        DML **data manipulation
+            - SELECT
+            - INSERT 
+            - UPDATE 
+            - DELETE
+        DCL **data control
+            - GRANT 
+            - REVOKE 
+        TCL **TRANSACTION CONTROL 
+            - BEGIN 
+            - COMMIT 
+            - ROLLBACK 
+            - SAVEPOINT
+
+# TABLE CREATION SINTAX:
+
+    CREATE TABLE IF NOT EXISTS db_name.table_name(
+        column_name column_type column_attribute
+    )
+
+    **column_attributes :
+        - NOT NULL 
+        - UNIQUE
+        - DEFAULT default_value
+        - AUTO_INCREMENT
+
+    example: 
+
+        CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null
+        );
+
+# ADDING PRIMARY KEY 
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no)
+    );
+
+# ADDING PRIMARY KEY WITH CONSTRAINT
+
+    **CONTRAINT allow to rename the primary key
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            CONTRAINT PK_employees PRIMARY KEY (emp_no)
+    );
+
+    ** A table can have a primary keys made out of several columns
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            CONTRAINT PK_employees PRIMARY KEY (emp_no,first_name,last_name)
+    );
+
+
+# ADDING FOREIGN KEY 
+
+    FOREIGN KEY (table_column) REFERENCES other_table(table_column)
+
+    example:
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no),
+            FOREIGN KEY (emp_no) REFERENCES departemant(emp_no)
+    );
+
+# ADDING FOREIGN KEY WITH CONSTRAINT 
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no),
+            CONTRANINT FK_emp_no FOREIGN KEY (emp_no) REFERENCES departemant(emp_no)
+    );
+
+# ADDING PRIMARY KEY WITH ALTER TABLE
+
+    ALTER TABLE employees ADD CONTRAINT PK_employees PRIMARY KEY(emp_no)
+
+
+# ADDING FOREIGN KEYS
+
+# CREATE A TEPORAL TABLE 
+
+    **a temporal table only exists during a session
+    ** create a temporal table and insert into it the data form other table
+
+    CREATE TEMPORARY TABLE table_name select * from other_table_name
+
 
 
 
