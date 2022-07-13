@@ -1,0 +1,328 @@
+
+MYSQL
+
+# MYSQL LOCAL INSTALLATION (LINUX UBUNTU)
+
+    # Installation 
+
+        sudo apt update 
+        sudo apt upgrade
+        sudo at install mysql-server
+
+        ** check the installation worked by 
+
+        mysql-version
+
+        ** output --> mysql VER 8.0.25 
+
+    # Additional database security functionalities
+    ** Once the basic mysql server is installed it is
+    necessary to install additional security features 
+    to create users and  manage permissions
+
+    **First change the authentication parameters 
+    for the root user 
+
+        sudo mysql
+
+        ALTER USER 'root'@'localhost' IDENTIFIED WITH 
+        mysql_native_password by 'mynewpassword';
+
+        **Where mynewpassword is the password the root user will use
+    
+    **Now proceed with the installation with the secure features
+
+        sudo mysql_secure_installation
+
+    **Proceed with installation steps
+
+# ENTER MYSQL CLI
+
+    ** -u stands for user , -p stands for requesting for password 
+    mysql -u user_name -p 
+
+
+# CHANGE PASSWORD POLICY RULES
+
+    **in mysql cli
+        SHOW VARIABLES LIKE 'validate_password%';
+        SET GLOBAL validate_password.policy=LOW;
+        SET GLOBAL validate_password.length=0;
+        
+    **These changes are not permant and are only meant to be used once
+    ** Now you can create whatever user you want with any
+    password
+
+    ** To check the current list of users :
+    SELECT user,host FROM mysql.user;
+       
+
+# ADDING NEW USERS
+
+        CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
+
+        or 
+
+        ALTER USER 'user'@'localhost' IDENTIFIED BY 'new_password';
+        FLUSH PRIVILEGES;
+
+
+# GRANTING ACCESS TO SCHEMA TO A USER
+
+    **as root :
+
+    GRANT permissions, , ,  ON SCHEMA schema_name TO user_name
+
+    example :
+
+        GRANT SELECT,UPDATE,INSERT,DELETE ON SCHEMA.* TO 'user'@'localhost'
+
+    **or grant all privileges:
+
+        GRANT ALL PRIVILEGES ON SCHEMA.* TO 'user'@'localhost'
+
+    **To grant privileges only to an specific table in that schema use:
+
+        GRANT ALL PRIVILEGES ON SCHEMA.table_name TO 'user'@'localhost'
+
+
+# CREATING/IMPORTING A DATABASE
+
+        CREATE DATABASE IF NOT EXISTS DB_database_name
+
+        **to delete it 
+        DROP database DB_employees
+        or
+        DROP database IF EXISTS DB_employees 
+
+        ** select the created database
+        use DB_employees
+
+        **once selected a database
+        use 'source' command to select a .sql to import a fully build database
+        **This method is usefull to import large data volumes
+        
+        source  /home/dutfcola-dev/Downloads/employees-db/dbEmployees.sql
+
+        **There is a second way of executing this option for creating a database.
+
+            - create a schema in mysql (from workbench or terminal)
+            - now from outside of the cli execute :
+
+                mysql -u root -p schema_created < url_to_file.sql
+
+
+
+# EXPORT A DATABASE
+
+        Run the command from terminal :
+
+            mysqldump -u root -p name_of_schema > /url/folder/url_to_file/file.sql
+
+
+# EXPORT/IMPORT A SINGLE TABLE 
+
+        **Run command 
+        **export
+        mysqldump -h localhost -u root -p schema_name table_name > tablem_name.sql
+
+        **import ** this only works if the .sql contains an exported table
+        mysql -h localhost -u root -p schema_name < tablem_name.sql
+
+
+# SQL QUERIES
+
+    **We have 4 main categories of queries :
+
+        DDL **data definision
+            - CREATE
+            - ALTER
+            - DROP
+            - TRUNCATE
+        DML **data manipulation
+            - SELECT
+            - INSERT 
+            - UPDATE 
+            - DELETE
+        DCL **data control
+            - GRANT 
+            - REVOKE 
+        TCL **TRANSACTION CONTROL 
+            - BEGIN 
+            - COMMIT 
+            - ROLLBACK 
+            - SAVEPOINT
+
+
+# TABLE CREATION SINTAX:
+
+    CREATE TABLE IF NOT EXISTS db_name.table_name(
+        column_name column_type column_attribute
+    )
+
+    **column_attributes :
+        - NOT NULL 
+        - UNIQUE
+        - DEFAULT default_value
+        - AUTO_INCREMENT
+
+    example: 
+
+        CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null
+        );
+
+
+# ADDING PRIMARY KEY 
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no)
+    );
+
+
+# ADDING PRIMARY KEY WITH CONSTRAINT
+
+    **CONTRAINT allow to rename the primary key
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            CONTRAINT PK_employees PRIMARY KEY (emp_no)
+    );
+
+    ** A table can have a primary keys made out of several columns
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            CONTRAINT PK_employees PRIMARY KEY (emp_no,first_name,last_name)
+    );
+
+
+# ADDING FOREIGN KEY 
+
+    FOREIGN KEY (table_column) REFERENCES other_table(table_column)
+
+    example:
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no),
+            FOREIGN KEY (emp_no) REFERENCES departemant(emp_no)
+    );
+
+
+# ADDING FOREIGN KEY WITH CONSTRAINT 
+
+    CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no),
+            CONTRAINT FK_emp_no FOREIGN KEY (emp_no) REFERENCES departemant(emp_no)
+    );
+
+
+# ADDING CASCADE CLAUSE 
+
+    **The cascade clause can only be applyed to foreign keys. 
+    The idea is that if the reference is modified/deleted this will also affect the current table
+    that has the cascade clause specified.
+     
+    **If the on cascade clause is not used we may run into a table integrity error
+
+    example of clause:
+
+        - ON DELETE CASCADE
+        - ON UPDATE CASCADE 
+    
+    example :
+
+        CREATE TABLE IF NOT EXISTS employees(
+            emp_no int not null auto_increment,
+            birth__date date not null,
+            first_name varchar(16) not null,
+            last_name varchar(16) not null,
+            sex enum('M','F') not null,
+            hire_date date not null.
+            PRIMARY KEY(emp_no),
+            CONTRANINT FK_emp_no FOREIGN KEY (emp_no) REFERENCES departemant(emp_no)
+            ON DELETE CASCADE
+    );
+    
+    **if the reference in departemant is deleted the changes in the table 
+    employees will also be afected.
+
+
+# ADDING PRIMARY KEY WITH ALTER TABLE
+
+    ALTER TABLE employees ADD CONTRAINT PK_employees PRIMARY KEY(emp_no)
+
+
+# CREATE A TEMPORAL TABLE 
+
+    **a temporal table only exists during a session
+    ** create a temporal table and insert into it the data form other table
+
+    CREATE TEMPORARY TABLE table_name select * from other_table_name
+
+
+# ALTER TABLE (DDL)
+
+    **add,create or mofify columns and data in tables
+    **sintaxis:
+
+        ALTER TABLE table_name ddl command 
+    
+    commands : 
+    
+        ** ADD column_name data_type attributes FIRST | AFTER some_column
+        ** DROP COLUMN column_name 
+        ** MODIFY column_name data_type atributes
+        ** CHANGE COLUMN column_name new_column_name 
+
+
+# SHOW TABLE DESCRIPTION
+
+# HOW TO USE MYSQL WITH DOCKER
+
+    *open mysql shell in the docker container
+        -   docker exec -it <container_name> bash
+    *authenticate
+        - mysql -u root -p 
+    *introduce password 
+    *select a database
+    USE <database_name>
+
+** for additional docuemtnation about instructions and commands consult mysql documentation
+    in w3shcool.com
+
+
+

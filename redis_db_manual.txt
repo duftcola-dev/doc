@@ -1,0 +1,23 @@
+REDIS:
+
+#HOW TO USE REDIS
+    *start the redis server :
+        - redis-server
+    *enter in the redis shell :
+        - redis-cli
+    *authenticate:
+        - auth <roo-password>
+
+#BASIC COMMMANDS :
+
+    *redis follows the scheme : key:key value
+
+    example 
+    user:name "robin"
+    user:address "london"
+
+    GET <key:key> * returns the value of the speficied key
+    SET <key:key> * creates the speficied key and sets a value
+    SAVE *executin just this word will save the data permanently in the database
+    EXIT *to low out of the redis shell
+
