@@ -154,6 +154,10 @@ MYSQL
             - SAVEPOINT
 
 
+---------------------------------------------------------
+DDL
+---------------------------------------------------------
+
 # TABLE CREATION SINTAX:
 
     CREATE TABLE IF NOT EXISTS db_name.table_name(
@@ -306,10 +310,77 @@ MYSQL
         ** ADD column_name data_type attributes FIRST | AFTER some_column
         ** DROP COLUMN column_name 
         ** MODIFY column_name data_type atributes
-        ** CHANGE COLUMN column_name new_column_name 
+        ** CHANGE COLUMN column_name new_column_name atributes
+
+    example :
+
+        ALTER TABLE table_name ADD CONSTRAINT PK_id PRIMARY KEY(id)
+    example:
+        ALTER TABLE table_name ADD CONSTRAINT FK_name FOREIGN KEY (name) REFERENCES person(name)
+    example:
+        ALTER TABLE DROP CONSTRAINT FK_someconstraint
 
 
-# SHOW TABLE DESCRIPTION
+#DROP TABLE (DDL)
+
+    **delete table 
+    DROP TABLE table_name 
+
+    **rename table
+    RENAME TABLE table_nname TO new_table_name 
+
+    **delete all data in a table
+    TRUNCATE TABLE table_name 
+
+
+
+#CALCULATED or MATERIALIZED VIEWS/COLUMNS (DDL)
+
+    **It is possible to genereta tables and columns from expresions
+    or formulas . These are called calculated columns
+    
+    PROS:
+        > You can use them to create more compact results from large queries
+          therefore they can be used to simplify queries .
+        > This type of views help to speed up queries if done properly and used 
+          with indexes.
+        > If used as virtual they do not occupy space in your database
+        > If calculations in a query are expensive consider using MATERIALIZED/calculated views
+    CONST:
+        > UPDATE,DELETE and ALTER operations are slower. Use MATERIALIZED views only for SELECT queries
+
+    **sintaxis:
+
+        column GENERATED ALWAYS AS (expression) VIRTUAL | STORED
+
+    **more sintanix:
+
+    new_column_name [GENERATED ALWAYS] as (expression) 
+    [VIRTUAL|STORED] [NOT NULL | NULL] [UNIQUE KEY] | [PRIMARY KEY]
+    [COMMENT]
+
+    **VIRTUAL : Any calculation will be virtula and not stored in the database
+    **STORED : Column generated from calculation will be stored
+
+    example : 
+        ** RANDOM NUMBER FORMULA in MYSQL :
+        ** This generates a random number between a and b 
+            (RAND()*(a-b+1)+a )
+
+        CREATE TEMPORARY TABLE ProjectCost(
+            manager INT not null,
+            project INT not null,
+            developers INT not null,
+            dev_cost INT not null, 
+            managerial_cost INT not null,
+            estimated_time INT not null,
+            total_cost INT GENERATED ALWAYS as ((dev_cost+managerial_cost)*estimated_time) VIRTUAL not null
+        )engine = innoDB;
+
+        **Here we are creating a table with manager,project and developer which are data stored in our
+        database and generating(calculating) total_cost based on the data of other columns.
+   
+
 
 # HOW TO USE MYSQL WITH DOCKER
 
