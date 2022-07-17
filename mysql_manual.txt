@@ -395,8 +395,81 @@ DDL
 
         **Here we are creating a table with manager,project and developer which are data stored in our
         database and generating(calculating) total_cost based on the data of other columns.
-   
 
+
+# CREATE A TRIGGER
+
+    **A trigger is a function "triggered" after or before and action is
+    executed on a table in a database. 
+    ** And action can be an operation like INSERT , UPDATE, DELETE , CREATE etc
+    **Triggers are linked to a table.
+    **In order to create a trigger you must be a superuser
+
+    **Creating a trigger
+
+    CREATE TRIGGER 
+        triger_name trigger_time 
+        some_action ON table_name 
+        FOR EACH ROW trigger_order function_or_action
+
+     - trigger_time: { BEFORE | AFTER }
+
+     - trigger_event: { INSERT | UPDATE | DELETE }
+
+     - trigger_order: { FOLLOWS | PRECEDES } other_trigger_name ** Only in case you wish
+     to chain triggers
+
+
+    example :
+
+        CREATE TRIGGER agecheck BEFORE INSERT ON people FOR EACH ROW 
+        IF NEW.age < 0 THEN 
+            SET NEW.age = 0; 
+        END IF;
+    
+
+# BASIC INSERT VALUE INTO TABLE 
+
+    **basic insert operation 
+        INSERT PRIORITY INTO table_name (tablefield1,tablefield2) VALUES (value_tablefield1,value_tablefield2);
+
+        PRIORITY : [LOW_PRIORITY | HIGH_PRIORITY | IGNORE]
+         - if you use the LOW_PRIORITY modifier, execution of the
+          INSERT is delayed until no other clients are 
+          reading from the table.
+         - ignore errors with the clause IGNORE . INSERT IGNORE INTO table_name
+         - HIGH_PRIORITY affects only storage engines that use only table-level
+          locking (such as MyISAM, MEMORY, and MERGE).
+
+        example:
+            INSERT INTO people (name,surname) VALUES ("Robin","viera");
+
+# INSERT SELECT 
+
+    **allows you to insert values in a table "B" with the result
+    of the SELECT of a table "A"
+
+    example:
+        INSERT INTO managers (id) 
+            SELECT employees.id FROM employees
+                WHERE employees.category = "A";
+
+        **here we are inserting values in managers from table 
+        employees
+
+# INSERT ON DUPLICATE KEY 
+
+    **launch and insert operation that handles duplicated keys
+    example:
+        INSERT INTO employees (a,b,c) VALUES (1,2,3)
+        ON DUPLICATE KEY UPDATE c = c+1;
+
+    example:
+        UPDATE employees SET c=c+1 WHERE a=1; 
+
+    example :
+        INSERT INTO employees(a,b,c) VALUES (1,2,3) ON
+        DUPLICATE KEY UPDATE  c = VALUES(a) * 2;
 
 # HOW TO USE MYSQL WITH DOCKER
 
