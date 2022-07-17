@@ -112,6 +112,22 @@ MYSQL
                 mysql -u root -p schema_created < url_to_file.sql
 
 
+# CREATING  A DATABASE THAT ALLOWS ADDITIONAL / SPECIAL CHARACTERS
+
+    CREATE DATABASE Database_name CHARACTER SET charset_name_here COLLATE collation_name_here 
+
+    ** we can also add these features in a database that already exists 
+    with :
+
+    ALTER DATABASE database_name CHARACTER SET charset_name COLLATE collation_name_here
+
+    exmple : 
+
+        CREATE DATABASE db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+    ** To see the current collation and charset in a database use :
+        USE db_name;
+        SELECT @@character_set_database, @@collation_database;
 
 # EXPORT A DATABASE
 
