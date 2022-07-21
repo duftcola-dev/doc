@@ -426,7 +426,11 @@ DDL
         IF NEW.age < 0 THEN 
             SET NEW.age = 0; 
         END IF;
-    
+
+
+--------------------------------------------------------------------------------
+DML 
+-------------------------------------------------------------------------------- 
 
 # BASIC INSERT VALUE INTO TABLE 
 
@@ -470,6 +474,119 @@ DDL
     example :
         INSERT INTO employees(a,b,c) VALUES (1,2,3) ON
         DUPLICATE KEY UPDATE  c = VALUES(a) * 2;
+
+
+# SELECT 
+
+    **extract / select data 
+
+    example :
+
+        SELECT  * FROM table_name WHERE condition ORDER_BY column ASC / DESC 
+
+    ** usig string methods :
+    LEFT : take the specified number of caracter from the field
+        LEFT (string,number_of_characters)
+
+    DATE_FORMAT : format a date in certain way 
+        DATE_FORMAT (date,format_as_string)
+
+    ROUND : round a number
+        ROUND(number,decimals)
+
+    BETWEEN: fetch date in a range of values.
+        BETWEEN value_a AND value_b
+    
+    IS [NOT] NULL : fetches by values that are null or not.
+
+    IN: works as a compact OR operator, returns data that
+    matches with the specified values .
+
+        SELECT * FROM table where id in(1,2,4,12,2);
+    
+        **IN also can be used to cancatenate subqueries :
+
+            SELECT * FROM talbe_name where id in(
+                SELECT id from other table where price > 100
+            );
+       
+        Sometimes subqueries can be more efficient than joins.
+        It is worth try in which case one is more efficient than 
+        the other.
+
+    example : 
+
+        SELECT id,ROUND(income,2) as "income",
+        DATE_FORMAT(date,"%d/%m/%Y") as "date",
+        LEFT(name,3) as "name" FROM
+        bank_data WHERE date between "2008-01-04" AND "2009-01-01"
+        ORDER BY income DESC;
+    
+    example :
+
+        select * from personas
+        where id in (1,2,3,4);
+    
+    example :
+
+        select * from ingresosEgresos
+        where idGrupoIngEg in(
+	    select idGrupoIngEg where idGrupoIngEg between 3 and 5
+        );
+
+    
+    example:
+
+        select * from entradaSalidaDinero
+        where idPersonas in (
+	    select id from personas
+	    where nombre in ('JUAN PEREZ GARCIA','ARACELI ORTIZ PINEDO')
+        );
+
+
+# OPERATOR REGEXP / LIKE
+
+    This operators are used for search patterns and regular expresions .
+    . The main difference between like and regexp is that LIKE is not case 
+    sensitive.
+
+    example with LIKE :
+
+        %a : all string that end with "a"
+        a% : all strings that start with "a"
+        %a% : all string that contain
+
+    example  with regexp:
+        **it uses the same sintaxis than convensional regular expresions
+
+        'some' : string contains the word/phrase 'some'
+        '^ala' : string starts with word/phrase 'ala'
+        'for$' : string ends with the word/phrase 'for'
+        'sn|es|ps' : array of matches .Finds string that contains 'sn' or 'es' or 'ps'.
+
+    example :
+
+        SELECT * FROM Employees.Employees where name like 'qui%';
+    
+    example: 
+
+        SELECT * FROM Employees.Employees where 
+
+    example:
+
+        SELECT * FROM Employees.Employees where name like '%ta';
+
+    example:
+
+        SELECT * FROM Employees.Employees where name like '%lu%';
+
+    example with regexp:
+
+        **get values where name contains 'lup' and suername contains 'min'
+
+        SELECT * FROM Employees.Employees where 
+        name regexp 'lup' and surname regexp 'min';
+
 
 # HOW TO USE MYSQL WITH DOCKER
 
