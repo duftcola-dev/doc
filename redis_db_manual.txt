@@ -8,6 +8,11 @@ REDIS:
     *authenticate:
         - auth <roo-password>
 
+    ** by default redis has a default user or root user that
+    only requires a password.
+    
+    ** new user can be added that will require an username.
+
 #BASIC COMMMANDS :
 
     *redis follows the scheme : key:key value
