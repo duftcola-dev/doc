@@ -23,6 +23,7 @@ REDIS:
 
     GET <key:key> * returns the value of the speficied key
     SET <key:key> * creates the speficied key and sets a value
-    SAVE *executin just this word will save the data permanently in the database
+    SAVE *executing just this word will save the data permanently in the database and will create 
+    a snapshot
     EXIT *to low out of the redis shell
 

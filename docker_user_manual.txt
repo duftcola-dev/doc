@@ -1,6 +1,6 @@
 DOCKER USER MANUAL
 
-#Basic commands
+# Basic commands
 
 	
 	docker ps  **current running container
@@ -16,13 +16,13 @@ DOCKER USER MANUAL
 
 ----------------------------------------------------------------------------------	
 
-#Download docker image : 
+# Download docker image : 
 
  	docker pull <image_name>
 
 ---------------------------------------------------------------------------------------
 
-#Create docker images
+# Create docker images
 
 ** Docker files are blueprints for creating images or "recipes". This images created by docker files
 can be used in a docker compose just like the stadard ones.
@@ -60,7 +60,7 @@ Example :
 
 ---------------------------------------------------------------------------------------------	
 	
-#Build docker file :
+# Build docker file :
 
 	docker build -t <docker_image_name:version> <path_to_docker_file>
 	
@@ -73,7 +73,7 @@ How to retag/tag a dockerfile :
 
 ---------------------------------------------------------------------------------------------
 
-#Run docker container:
+# Run docker container:
 
 
 	 docker run -d -p<host_port>:<container_port> --name <custom_name> --net <network_name> image_name
@@ -86,7 +86,7 @@ How to retag/tag a dockerfile :
 
 ---------------------------------------------------------------------------------------------
 
-#Interact with the environment files of the container: 
+# Interact with the environment files of the container: 
 
 	docker exec -it <container_id> /bin/bash
 
@@ -103,7 +103,7 @@ How to retag/tag a dockerfile :
 
 ---------------------------------------------------------------------------------------------
 
-#Create containers network
+# Create containers network
 
 How to connect container and create a network of containers :
 Example ( connect a flask container with a database container)
@@ -113,7 +113,7 @@ Example ( connect a flask container with a database container)
 
 ---------------------------------------------------------------------------------------------
 
-#Creating docker compose using docker yaml
+# Creating docker compose using docker yaml
 
 ** Docker compose is just a file to contain docker commands
 **When Creating a Docker compose file no it is no necessary to create a network since the docker compose file does
@@ -153,7 +153,7 @@ Using the docker compose command :
 
 -------------------------------------------------------------------------------------------
 
-#Data persistance with Docker volumes. 
+# Data persistance with Docker volumes. 
 
 ** The main use of docker volumes is to have data persistance . That means all the infor in your container/s is copied into a local folder so it can be save every time the container/s are stoped and restarted.
 So basically the path to a file/folder in our host machine is added to the container fro persintency .
@@ -172,7 +172,7 @@ There are 2 types of docker volumes :
 		- .:/sub_folder  **in case you want to create the volumen in the current location
 --------------------------------------------------------------------------------------------
 
-#Create a .dockerignore file
+# Create a .dockerignore file
 
 	A .dockerignore file is a file that allow us to spedify rules on wich files 
 	should be copied and build during the image building process thus they wont be
@@ -199,7 +199,7 @@ There are 2 types of docker volumes :
 
 -------------------------------------------------------------------------------------------
 
-#Debugging docker container
+# Debugging docker container
 
 	Basic debbuging :
 
@@ -211,7 +211,7 @@ There are 2 types of docker volumes :
 
 --------------------------------------------------------------------------------------------
 
-#Creating a private repository for Docker in AWS ECR (elastic container registry)
+# Creating a private repository for Docker in AWS ECR (elastic container registry)
 	
 	** ECR is a private docker repository
 	** I has registry options

@@ -1,5 +1,5 @@
 
-MYSQL
+## MYSQL USER MANUAL
 
 # MYSQL LOCAL INSTALLATION (LINUX UBUNTU)
 
@@ -337,7 +337,7 @@ DDL
         ALTER TABLE DROP CONSTRAINT FK_someconstraint
 
 
-#DROP TABLE (DDL)
+# DROP TABLE (DDL)
 
     **delete table 
     DROP TABLE table_name 
@@ -350,7 +350,7 @@ DDL
 
 
 
-#CALCULATED or MATERIALIZED VIEWS/COLUMNS (DDL)
+# CALCULATED or MATERIALIZED VIEWS/COLUMNS (DDL)
 
     **It is possible to genereta tables and columns from expresions
     or formulas . These are called calculated columns
@@ -484,6 +484,9 @@ DML
 
         SELECT  * FROM table_name WHERE condition ORDER_BY column ASC / DESC 
 
+        **you can use an alias for your table if your table as a very long or complicated name
+        SELECT * FROM table_name table_alias WHERE conditions..
+
     ** usig string methods :
     LEFT : take the specified number of caracter from the field
         LEFT (string,number_of_characters)
@@ -586,6 +589,218 @@ DML
 
         SELECT * FROM Employees.Employees where 
         name regexp 'lup' and surname regexp 'min';
+
+
+# PAGING IN MYSQL AND THE LIMIT OPERATOR
+
+    **The limit operator accepts 2 arguments. 
+
+        - the first argument determines or limits the number of results.
+
+        example : 
+
+            SELECT * FROM Employees.Employees limit 10 ;
+
+        - If used the second argument , the first argument becomes an index 
+        and the second argument specifies how many result will optain from that 
+        index.
+
+        example :
+
+            SELECT * FROM Employees.Employees limit 4,10 ;
+
+            **The fetch of information will start at index 4 in our table 
+            and extract 10 results from index 4 --> from index 4 to 14.
+            A total of 10 items.
+
+            **This is the main method to make paging.
+
+
+# DML INNER JOIN 
+
+    **A join combines columns from 2 or more tables in a single dataset 
+    **Tables are ususaly connected by their PRIMARY - FOREIGN KEYS relations
+    
+    sintaxis :
+
+        SELECT seletct_list 
+        FROM table1 
+        [INNER] JOIN table2 ON conditions
+        [INNER] JOIN table3 ON conditions 
+
+        the INNER keys selects record that match in both tables
+
+    example 2 tables  join:
+
+        SELECT personas.id,personas.nombre as 'cliente',entradaSalidaDinero.montoIE as 'transaccion' FROM personas
+        INNER JOIN entradaSalidaDinero ON 
+        personas.id = entradaSalidaDinero.idPersonas AND 
+        montoIE between 3900 and 4000
+        ORDER BY entradaSalidaDinero.montoIE DESC ;
+
+    example 3 tables join:
+
+        select 
+        personas.id,personas.nombre,
+        entradaSalidaDinero.montoIE as 'cantidad' , 
+        ingresosEgresos.idTipoIngEg as 'movimiento',
+        ingresosEgresos.idGrupoIngEg as 'grupo movimientos'
+        from personas
+        inner join entradaSalidaDinero on  personas.id = entradaSalidaDinero.idPersonas
+        inner join ingresosEgresos on entradaSalidaDinero.idIngresosEgresos = ingresosEgresos.id and ingresosEgresos.idTipoIngEg = 1;
+
+# USING TABLE ALIASES WITH JOIN
+
+    SELECT * 
+    FORM TABLE table_1 t1 
+    [INNER] JOIN table2 t2 ON t1.id = t2.id
+    [INNER] JOIN table3 t3 ON t2.id = t3.id
+
+    ** notice how once you create the aliases t1,t2,t3 
+
+# EXTACTING DATA FORM 2 DATABASES :
+
+    sintaxis : 
+
+        SELECT * FROM table_1 
+        INNER JOIN database.table.field alias ON  alias.id = table1.id
+
+
+# LEFT JOIN / RIGHT JOIN
+
+    example : 
+
+        SELECT client,chash,date
+        FROM clientes JOIN facturas ON clientes.id = facturas.id 
+
+        ** left join returns the items from the left table 
+        that are found in the right table. 
+
+        **If the left table id exists in the right table 
+        return client,chash,date that correspond to that id .
+
+        **If no item from the left if found on the right then the 
+        search returns null  for client,chash,date
+
+        **the RIGHT JOIN works exactly the same way except from the left ---> right 
+
+        (left table)        (right table)
+        clientes     JOIN   facturas
+
+        left join
+        **clientes <---- facturas
+
+        right join
+        **clinetes ----> facturas 
+
+        ** RIGHT/LEFT join is usefull to know what items from one table exists in other time 
+        or to if items of one databases exists in the table of other database.
+
+
+# COMPACT JOIN INSTRUCTIONS WITH 'USING' AND 'NAUTURAL'
+
+    ** the word using allows us to make a join by fields
+    ** 'using' replaces the word ON and the prefix of the tables
+    effectively replacing people.id / titles.id 
+    
+    **** using only works if the fields used in the join are iqual***
+    *** therefore using only works because both fields are called 'id' ****
+
+    SELECT name,surname FROM 
+    people  JOIN titles using(id)
+
+
+# IMPLICIT INNER JOIN 
+
+    Though the query only uses WHERE , the join union is implicit 
+    therefore producing the same result as an inner join.
+    Perfomance between inner join and implicit inner join may vary.
+
+    sintaxis : 
+
+        select table1.field,table2.field,table3.field 
+        from talbe1,table2,table3 
+        where 
+        table1.field = table2.field
+        and
+        table2.field = table3.field
+
+# UNION 
+
+    **An union combines the result of several select queries.
+    **An union combines the values of one table into another table
+    eliminating duplicates. Unions eliminate duplicates
+    **Each result returns the same number of columns
+    **Tables to be unionized must have the same type of columns.
+    
+    **select statements must have the same number of fields :
+
+    select name,surname,phone from users 
+    union
+    select name,surname,id from clients
+    order by name;
+    
+    **This instruction will join the 2 tables by name
+    eliminating duplicated fields.
+
+    example :
+
+        select statament_1
+        UNION [ALL] 
+        select statament_2
+        UNION [All]
+        select statament_3
+        ORDER BY statament
+
+# SUBQUERIES 
+
+    **CLAUSES that allow us to make subqueries :
+
+        - WHERE 
+        - HAVING 
+        - FROM 
+        - SELECT 
+
+    # SCALAR SUBQUERIES 
+        example with select/where : 
+
+            select * ,(select avg(montoIE) from entradaSalidaDinero) as 'promedio' 
+            from entradaSalidaDinero
+            WHERE montoIE > (
+                select avg(montoIE) from entradaSalidaDinero
+                );
+
+        example with variables :
+
+            SET @promedio:= (select avg(montoIE) from entradaSalidaDinero);
+            select * , @promedio as 'promedio'
+            from entradaSalidaDinero
+            where montoIE > (@promedio);
+        
+    # LIST SUBQUERIES 
+
+
+        1)example of an inner join :
+
+           select entradaSalidaDinero.id,entradaSalidaDinero.montoIE from entradaSalidaDinero
+           inner join personas ON (entradaSalidaDinero.idPersonas = personas.id)
+           where personas.nombre like '%JUAN%'; 
+        
+            ** the result will be the fields of entradaSalidaDinero where idPersonas
+            exists in personas + the fields of personas we may want to show.
+
+        2)now the alternative using a subquery : 
+
+            select * from entradaSalidaDinero
+            where entradaSalidaDinero.idPersonas 
+            in
+            (
+                select id from personas where personas.nombre like '%JUAN%'
+            );
+
+            ** the result will be only the fields of entradaSalidaDinero where idPersonas
+            exists in personas
+            
 
 
 # HOW TO USE MYSQL WITH DOCKER

@@ -18,7 +18,7 @@
     django-admin startproject mysite
 
     ** a project folder/container is created .
-    ** this is project , not a app
+    ** this is a project , not a an app
     ** a django project can contain many apps
     ** every django project contains at least one app running.
     ** in the project manage.py is a CLI tha can be used to manage your project
