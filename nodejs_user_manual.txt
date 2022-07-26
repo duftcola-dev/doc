@@ -49,7 +49,64 @@
 
         rm -rf "$NVM_DIR"
 
+
+# Creating a project  / managin deppendencies 
+
+    **initialize and create a project
+
+    npm init project_name project_folder
     
+    example :
+
+        npm init myapp ./app
+
+    **npm manages downloads of dependencies of your project.
+
+    npm install 
+
+    **install a single package 
+
+    npm install pacakge_name 
+
+    -- save-dev : installs and adds the entry to the package.json file devDependencies
+    -- no-save : installs but does not add the entry to the package.json file dependencies
+    -- save-optional : installs and adds the entry to the package.json file optionalDependencies
+    -- no-optional : will prevent optional dependencies from being installed
+
+    **update pacakages
+
+    npm update
+
+    **update specific pacakage
+
+    npm update <package-name>
+
+    
+    **run scripts / tasks 
+
+    npm run <task-name>
+
+    //in package json 
+
+        {
+        "scripts": {
+            "start-dev": "node lib/server-development",
+            "start": "node lib/server-production"
+        }
+    }
+
+    ** the package.json is a manifest with metainformation of your project
+    ** the package-lock.json is a file is to keep track of the exact version of 
+    every package that is
+
+    **show the version of the current packages 
+    npm list 
+
+    **unistall a package 
+
+    npm uninstall -g <package-name>
+
+
 # Launch node app 
 
     **app.js being the index file of your project
@@ -63,6 +120,7 @@
     **Add permisions 
 
         chmod u+x app.js
+
 
 # Enable app auto restart 
 
@@ -212,3 +270,329 @@
 
     const {car} = require('./car');
     const {car2} = require('./car');
+
+
+# JAVASCRITP TIMERS
+ 
+    setTimeout(() => {
+    // runs after 2 seconds
+    }, 2000);
+
+    setTimeout(() => {
+    // runs after 50 milliseconds
+    }, 50);
+
+# READING FILES 
+
+    const fs = require('fs');
+
+    fs.readFile('/file.json', (err, data) => {
+    if (err) {
+        // handle error
+        console.log(err);
+        return;
+    }
+
+# SENDING HTTP REQUEST
+
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = () => {
+    if (xhr.readyState === 4) {
+        xhr.status === 200 ? console.log(xhr.responseText) : console.error('error');
+    }
+    };
+    xhr.open('GET', 'https://yoursite.com');
+    xhr.send();
+
+
+# Promises 
+
+    **A promise is commonly defined as a proxy for a value 
+    that will eventually become available.
+    **Once a promise has been called, it will start in a pending state.
+    **Every promise starts with a promise constructor 
+    **async / await uses primises in the back 
+
+    const p = new Promise((resolve, reject) => {
+        if some_condition{
+            resolver(done) //task finished
+        }else {
+            reject(wait) //pending task not finished
+        }
+    });
+
+    example  reading a file :
+
+        const getFile = fileName => {
+            return new Promise((resolve, reject) => {
+                    fs.readFile(fileName, (err, data) => {
+                        if (err) {
+                            reject(err); // calling `reject` will cause the promise to fail with or without the error passed as an argument
+                            return; // and we don't want to go any further
+                        }
+                    resolve(data);
+                });
+             });
+        };
+
+
+    **function that launched the primise
+
+        getFile('/etc/passwd')
+        .then(data => console.log(data)) //then is used for the resolve case
+        .catch(err => console.error(err)); // catch for the reject case
+
+
+# MODERN ASYCN AWAIT 
+
+    **primses have a lot of bioler plating and thats why
+    async / await was introduced.
+
+    async function do_something(){
+
+    }
+
+    result = await do_something()
+
+
+    **or 
+
+    const aFunction = async () => {
+        return 'test';
+    };
+
+    aFunction().then(alert);
+
+    **or 
+    await aFunction(alert)
+
+
+# EVENT  EMITER
+
+    **Allows to create/emit gloval events or signals
+    accross the app that can be used to build logic 
+
+    example : 
+
+    const EventEmitter = require('events');
+    const eventEmitter = new EventEmitter();
+
+    eventEmitter.emit('start'); // an emiter 
+    eventEmitter.emit('start', 1, 100); //multiple aguments emiter 
+
+    eventEmitter.on('start', () => { //an event receiver
+    console.log('started');
+    });
+
+    eventEmitter.on('start', (start, end) => { //multiple aguments receiver 
+    console.log(`started from ${start} to ${end}`);
+    });
+
+
+-------------------------------------------------------
+
+-------------------------------------------------------
+
+
+# CREATE AND HTTP SERVER 
+
+
+    const express = require('express');
+    const app = express();
+    app.use(express.urlencoded({ //enable encoding
+        extended: true,
+        })
+    );
+    app.use(express.json()); //enable the use of json
+
+
+    app.get('/', (req, res) => {
+        res.send('Hi!');
+    });
+
+    app.post('/todos', (req, res) => {
+        console.log(req.body.some_json_data);
+    });
+
+    app.listen(3000, () => console.log('Server ready'));
+
+
+# SEND HTTP A GET REQUEST 
+
+    ** full url = https://whatever.com/todos
+    ** host name = whatever.com
+    ** path =/todos
+
+    const https = require('https');
+
+    const options = {
+    hostname: 'example.com',
+    port: 443,
+    path: '/todos',
+    method: 'GET',
+    };
+
+    const req = https.request(options, res => {
+    console.log(`statusCode: ${res.statusCode}`);
+
+    res.on('data', d => {
+        process.stdout.write(d);
+    });
+    });
+
+    req.on('error', error => {
+    console.error(error);
+    });
+
+    req.end();
+
+
+# SEND A POST / PUT /DELETE REQUEST 
+
+    const https = require('https');
+
+    const data = JSON.stringify({
+    todo: 'Buy the milk',
+    });
+
+    const options = {
+    hostname: 'whatever.com',
+    port: 443,
+    path: '/todos',
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length,
+    },
+    };
+
+    const req = https.request(options, res => {
+    console.log(`statusCode: ${res.statusCode}`);
+
+    res.on('data', d => {
+        process.stdout.write(d);
+    });
+    });
+
+    req.on('error', error => {
+    console.error(error);
+    });
+
+    req.write(data);
+    req.end();
+
+
+# READING FILES 
+
+    const fs = require('fs/promises');
+    
+    async function example() {
+        let filehandle;
+        try {
+            filehandle = await fs.open('/Users/joe/test.txt', 'r');
+            console.log(filehandle.fd);
+            console.log(await filehandle.readFile({ encoding: 'utf8' }));
+        } finally {
+            await filehandle.close();
+        }
+    }
+
+    example();
+
+    **filehandle is a file descriptor that can interact with
+    the open file 
+
+
+# READING FILE ASYNC 
+
+
+    const fs = require('fs');
+    const util = require('util');
+
+    async function example() {
+    const open = util.promisify(fs.open);
+    const fd = await open('/Users/joe/test.txt', 'r');
+    }
+
+    example();
+
+
+# INTERATING WITH FILES 
+
+    const path = require('path');
+    const notes = '/users/joe/notes.txt';
+
+    path.dirname(notes); // /users/joe
+    path.basename(notes); // notes.txt
+    path.extname(notes); // .txt
+
+    const name = 'joe';
+    path.join('/', 'users', name, 'notes.txt'); // '/users/joe/notes.txt'
+
+# WRITE FILE 
+
+    const fs = require('fs/promises');
+
+    async function example() {
+    try {
+        const content = 'Some content!';
+        await fs.writeFile('/Users/joe/test.txt', content);
+    } catch (err) {
+        console.log(err);
+    }
+    }
+    example();
+
+# APPEND TO A FILE 
+
+    const fs = require('fs/promises');
+
+    async function example() {
+    try {
+        const content = 'Some content!';
+        await fs.appendFile('/Users/joe/test.txt', content);
+    } catch (err) {
+        console.log(err);
+    }
+    }
+    example();
+
+
+# NODE JS BUFFERS 
+
+    **Buffers in Node js are fix size array that deal with
+    binary data , each item in a buffer array is 1 byte of data
+
+    example :
+
+        const byf_string = Buffer.from("Hey")
+
+        **The result of this will be an
+        array with each character of the string in ACII 
+
+            console.log(buf[0]); // 72
+            console.log(buf[1]); // 101
+            console.log(buf[2]); // 121
+
+        **Use console.log(buf.toString()); to get back the string data 
+
+        **Create a buffer and write data in it 
+
+        const buf = Buffer.alloc(4);
+        buf.write('Hey!');
+
+        buf[1] = 111; // o in UTF-8 //change the data 
+
+        console.log(buf.toString()); // Hoy! 
+
+
+    **You also just can initialize a buffer allocating
+    a fix amount of memory 
+
+    example
+
+        const buf = Buffer.alloc(1024); //safe allocation
+        **allocates 1KB 
+
+        const buf = Buffer.allocUnsafe(1024); //unsafe allocation 
+        **faster and unsafer than alloc
