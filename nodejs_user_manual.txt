@@ -2,4 +2,213 @@
 
 # Download node js 
 
+    ** Linux Ubuntu uninstall current node js 
+        sudo apt-get purge --auto-remove nodejs
+        sudo rm -r /etc/apt/sources.list.d/nodesource.list
+        
     ** Linux  Ubuntu installation
+
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    
+    ** Test the installaton is working 
+        sudo node --version
+        curl -fsSL https://deb.nodesource.com/test | bash -
+
+# Nvm 
+
+    - Nvm is a nodejs version manager in case you need to deal with 
+      code made in older versions o node js.
+    - It is advisable to install from nvm if you want to use node without root
+    privileges
+
+    **Install/upgrade nvm 
+
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+    
+    **Test the installation
+
+        command -v nvm
+        nvm --version
+    
+    **Install an specific version of nodejs
+
+        nvm install _version_number_here 
+
+        example : nvm install 16.3.0
+    
+    **List of available versions of nodejs
+
+        nvm ls-remote
+    
+    **Use the installed version 
+
+        nvm use node
+
+    **Uninstall nvm
+
+        rm -rf "$NVM_DIR"
+
+    
+# Launch node app 
+
+    **app.js being the index file of your project
+    node app.js 
+
+    **Add to you index file a shebang 
+
+        #!/usr/bin/env node
+        // your code
+
+    **Add permisions 
+
+        chmod u+x app.js
+
+# Enable app auto restart 
+
+    npm i -g nodemon 
+    
+    **or
+
+    npm i --save-dev nodemon
+
+# Run your application with autorestart (for development only) 
+
+    nodemon app.js
+
+
+# Start basic http server 
+
+    const express = require('express');
+    const app = express();
+
+    app.get('/', (req, res) => {
+    res.send('Hi!');
+    });
+
+    app.listen(3000, () => console.log('Server ready'));
+
+
+    ***Express is a framework that uses the http 
+    module under the hood, app.listen() returns 
+    an instance of http***
+
+
+# How to stop a node server (programatically).
+
+    **Usually when node runs in the console it can be stoped 
+    by ctrl + c but if it run in a remote system we must have a way to stop 
+    it programatically...
+
+    ...for that we have signals.
+
+    ***Signals are a POSIX intercommunication system: 
+    a notification sent to a process in order to notify 
+    it of an event that occurred.
+
+        const express = require('express');
+        const app = express();
+
+        app.get('/', (req, res) => {
+        res.send('Hi!');
+        });
+        const server = app.listen(3000, () => console.log('Server ready'));
+
+        process.on('SIGTERM', () => {
+        server.close(() => {
+            console.log('Process terminated');
+        });
+        });
+
+    We have to options :
+        - SIGKILL : SIGKILL is the signal that tells a process to 
+        immediately terminate, and would ideally act like process.exit().
+
+        - SIGTERM : SIGTERM is the signal that tells a process to gracefully 
+        terminate. It is the signal that's sent from process managers like upstart 
+        or supervisord and many others.
+
+    You can send this signal from inside the program, in another function:
+        
+        process.kill(process.pid, 'SIGTERM');
+
+        Or from another Node.js running program, or any other app running 
+        in your system that knows the PID of the process you want to 
+        terminate.
+
+
+# Reading Environment variables 
+
+    **install the dotenv  pacakage
+
+        npm install dotenv --save
+    
+    **create your .env file 
+    **fill the file
+
+    example : 
+
+    ** .env file
+
+    USER_ID="239482"
+    USER_KEY="foobar"
+    NODE_ENV="development"
+
+    **in your server sart file app.js 
+
+    require('dotenv').config();
+    process.env.USER_ID; // "239482"
+    process.env.USER_KEY; // "foobar"
+    process.env.NODE_ENV; // "development"
+
+
+# Nodejs import/export system 
+
+
+    **importing node modules
+    **to import the functionality exposed in the car.js file that 
+    resides in the current file folder.
+
+    //index.js
+    const {car} = require('./car');
+    
+
+    //car.js 
+    const car = {
+    brand: 'Ford',
+    model: 'Fiesta',
+    };
+
+    module.exports = car;
+
+
+    **If you have seleveral items in a module you
+    can always add them to the exports 
+    as object 
+
+
+    //car.js 
+
+    const car = {
+    brand: 'Ford',
+    model: 'Fiesta',
+    };
+
+    const car2={
+    brand: 'Ford',
+    model: 'Fiesta',
+    }
+
+    exports.car=car
+    exports.car2=car2 
+
+    **or
+    module exports={
+        car:car,
+        car2:car2,
+    }
+
+    //index.js 
+
+    const {car} = require('./car');
+    const {car2} = require('./car');

@@ -1,0 +1,106 @@
+# Accept arguments from console 
+
+    ** create a file cli.js 
+    ** launch the file as a cli
+
+    node cli.js joe 
+
+    ** read aguments :
+
+        **cli.js
+        const args = process.argv.slice(2);
+        args[0]; // joe
+    
+    example with more arguments :
+
+        **node cli.js joe doe
+        const args = process.argv.slice(2);
+        args[0]; // joe
+        args[1]; // doe
+    
+# Accept arguments with key : value format 
+
+    **install the pacakage minimalist
+    **cli.js 
+
+        const args = require('minimist')(process.argv.slice(2));
+
+    **use key value paris of arguments :
+
+        node app.js --name=joe 
+
+        **cli.js
+
+        const args = require('minimist')(process.argv.slice(2));
+        args.name; //joe
+
+    **use multiple arguments 
+        node app.js --name=joe  --surname=doe 
+
+        const args = require('minimist')(process.argv.slice(2));
+        args.name; //joe
+        args.surname //doe
+
+# Output to the command line 
+
+    console.log("some string"); //outputs to the command line
+    console.count(items); // outputs the number of items  
+
+    **start a timer 
+    console.time("time start");
+    console.timeEnd("timer ended);
+
+    **output with color 
+    npm install chalk@4
+    **cli.js
+    const chalk = require('chalk');
+    console.log(chalk.yellow('hi!'));
+
+# Create a progress bar 
+
+    const ProgressBar = require('progress');
+    const bar = new ProgressBar(':bar', { total: 10 });
+    const timer = setInterval(() => {
+    bar.tick();
+    if (bar.complete) {
+        clearInterval(timer);
+    }
+    }, 100);
+
+# Accept input(not args) from the console OPTION 1
+
+    ** creates and object(readline) capable to accept input 
+
+    const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    });
+
+    ** uses object to assign the input to variable (name)
+
+    readline.question(`What's your name?`, name => {
+    console.log(`Hi ${name}!`);
+    readline.close();
+    });
+
+
+
+# Accept input(not args) from the console OPTION 2
+
+
+    npm install inquirer
+
+    **it works very similar to the first option
+    
+    const inquirer = require('inquirer');
+    const questions = [
+    {
+        type: 'input',
+        name: 'name',
+        message: "What's your name?",
+    },
+    ];
+
+    inquirer.prompt(questions).then(answers => {
+    console.log(`Hi ${answers.name}!`);
+    });
