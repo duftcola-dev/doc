@@ -697,7 +697,7 @@ DML
         or to if items of one databases exists in the table of other database.
 
 
-# COMPACT JOIN INSTRUCTIONS WITH 'USING' AND 'NAUTURAL'
+# COMPACT JOIN INSTRUCTIONS WITH 'USING' AND 'NATURAL'
 
     ** the word using allows us to make a join by fields
     ** 'using' replaces the word ON and the prefix of the tables
@@ -802,7 +802,125 @@ DML
             exists in personas
             
 
+# ALL CLAUSE 
 
+    **The ALL clause is use to compare to all the values resultant from 
+    a query .
+    **The ALL clause works as a compact AND 
+
+    example:
+
+        X > ALL(2,4,1,6)
+
+        **This is the same that if X > 2 AND  X > 4 AND x > 1  AND x > 6 ...etc 
+        **Compared to IN that is like a compact OR
+        **If the subquery returns nothing then all is True by default
+
+    example :
+
+        **MontoIE means cash in this case
+        ** In this queries we get all personas that 
+        have montoIE > than all personas that have less or equal
+        to 4000 monotIE
+
+        select idPersonas from 
+		entradaSalidaDinero where montoIE > all(
+			select montoIE from entradaSalidaDinero where montoIE <= 4000
+		) 
+
+# ANY/SOME CLAUSE 
+
+    **any or some is in practical terms similar for exists but used in 
+    subqueries 
+
+    example :
+
+        **select any personas that is different than idPersonas = 2
+
+        select id,montoIE,idPersonas from entradaSalidaDinero
+        where montoIE  <> any (
+	    select montoIE from entradaSalidaDinero where idPersonas = 2
+        );
+
+        **or 
+        **select any personas where montoid > idPersonas =2 motnoIE
+
+        select id,montoIE,idPersonas from entradaSalidaDinero
+        where montoIE > any(
+        select montoIE from entradaSalidaDinero where idPersonas = 2
+        );
+
+
+# COORELATED SUBQUERIES 
+
+    **A coorelated subquery is like a nested for loop 
+    ** A coorelated subquery consist in a "father query" and a "subquery"
+    ** for each item in the father query the subquery will search in 
+    all the elements of the father 
+    ** A coorelated subquery often implies a table making a reference to itself
+
+    structure :
+        **notice is required to use an alias for the father query 
+
+        select all from table table_alias where condition (
+                select from  table where field condition table_alias.field
+            )
+    
+    example :
+
+        ** select the montoIE value from each idPersonas that is
+        bigger than the avg montoIE of that same idPersonas
+
+        select * from entradaSalidaDinero esd
+        where montoIE > (
+	        select avg(montoIE) from entradaSalidaDinero 
+            where idPersonas = esd.idPersonas group by idPersonas
+        );
+
+    
+    example 2 : **this example allows us to see the avg 
+
+        select *,( select avg(montoIE ) from entradaSalidaDinero where idPersonas = esd.idPersonas
+        ) as 'promedio'  from entradaSalidaDinero esd 
+        where montoIE > (
+            select avg(montoIE ) from entradaSalidaDinero
+            where idPersonas = esd.idPersonas
+        ) order by idPersonas
+
+
+    example 3 : select all personas that do not have a user in the 
+    table usuarios .
+
+        select * from personas pe
+        where id not in ( 
+	        select idPersona from usuarios where 
+		    pe.id = idPersona
+        );
+    
+    example 4 like example 3 but using exists:
+
+        select * from personas pe
+            where not exists ( 
+	        select idPersona from usuarios where pe.id = idPersona
+        );
+    
+    example 5 select all from personas that do not exists in pendientes 
+    **pendientes as 2 foreign keys to id personas 
+
+    select * from personas pe 
+        where not exists ( 
+	    select idPersonaQueAsigno,idPersonaAsignado from pendientes where
+        pe.id in(idPersonaQueAsigno,idPersonaAsignado)
+    );
+
+
+    example 6 : 
+
+        select * from personas pe 
+        where not exists ( 
+            select * from entradaSalidaDinero where
+            pe.id = idPersonas
+        );
 # HOW TO USE MYSQL WITH DOCKER
 
     *open mysql shell in the docker container

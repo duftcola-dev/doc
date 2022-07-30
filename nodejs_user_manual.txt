@@ -596,3 +596,169 @@
 
         const buf = Buffer.allocUnsafe(1024); //unsafe allocation 
         **faster and unsafer than alloc
+
+
+# NODE STREAMS 
+
+    **Node streams allows us to transfer data 
+    by chunks instead of all in one go.
+
+    For example when we are reading a file to send
+    the data to the front-end .
+    If the file is big this may take a while 
+    however  if stream it we can transfer the information
+    in small parts-
+
+    **They are a way to handle reading/writing files,
+    network communications, or 
+    any kind of end-to-end information 
+    exchange in an efficient way.
+
+
+    example of a stream sending data from a file :
+
+    const http = require('http');
+    const fs = require('fs');
+
+    const server = http.createServer((req, res) => {
+        const stream = fs.createReadStream(`${__dirname}/data.txt`);
+        stream.pipe(res);
+    });
+    server.listen(3000);
+
+        **Instead of waiting until the file is fully read, 
+        we start streaming it to the HTTP client as soon as we 
+        have a chunk of data ready to be sent.
+
+        **The pipe method is what "pipes" or streams the information
+        into the response (res) or any other destination.
+
+        **pipes can be chained into multiple destinations
+
+        src.pipe(dest1).pipe(dest2);
+
+    There are four classes of streams:
+
+    Readable: a stream which could be used for read data from it. 
+              In other words, its readonly.
+    Writable: a stream which could be used for write data to it. 
+              It is writeonly.
+    Duplex: a stream which can read and write data, basically its a 
+            combination of a Readable and Writable stream.
+    Transform: a Duplex stream which reads data, transforms the data, 
+                and then writes the transformed data in the desired format.
+
+
+# CREATE A READABLE STREAMS
+
+    **The name is confusing because a readable steam used
+    to send information.
+    **create the readable stream object 
+
+    const Stream = require('stream');
+    const readableStream = new Stream.Readable({
+        read(){},
+    });
+
+    **We can send information to that readble stream
+    by using the method push 
+
+    readableStream.push('hi!');
+    readableStream.push('ho!');
+
+    **notice this stream doesnt have destination since we
+    a havent speficied the pipe
+
+    readableStream.pipe();
+
+# READABLE AND WRITETABLE STREAM 
+
+    **writetable streams are used to receive information
+
+    const Stream = require('stream');
+    const readableStream = new Stream.Readable({read() {},});
+    const writableStream = new Stream.Writable();
+
+    writableStream._write = (chunk, encoding, next) => {
+    console.log(chunk.toString());
+    next();
+    };
+
+    readableStream.pipe(writableStream);
+    //notice the destination of the readble stream is
+    the writable stream
+
+    readableStream.push('hi!');
+    readableStream.push('ho!');
+
+    ** close / end the stream 
+    ** this must be donw always !
+
+    readableStream.on('close', () => writableStream.end());
+    writableStream.on('close', () => console.log('ended'));
+    readableStream.destroy();
+
+
+# CLASSES (JS ECMA6)
+
+class  class_name {
+    constructor (args){
+        this.arg=arg 
+    }
+}
+
+
+    **class inheritance 
+
+class  class_name extends parent_class {
+    constructor (parent_arg,arg){
+        super(parent_arg);
+        this.arg=arg;
+    }
+
+    class_method(){
+
+    }
+
+    #private_class_method(){
+
+    }
+}
+
+** private methods use #
+
+# SCHEMA VALIDATION
+
+    **there are several schema validation 
+    libraries for requests for nodejs 
+
+    - npm install joi
+    
+    doc about join here : https://joi.dev/api/?v=17.6.0 
+
+    - npm install --save express-validator
+
+    doc about express validator here https://express-validator.github.io/docs/
+
+
+# CUNCURRENCY TASKS JAVASCRITP
+
+    example : We have several tasks we want to run aynchronously
+
+        **This code will run on task after the other (not cuncurrency)
+        const makeAsync = async () =>{
+            const a = await getName("name");
+            const b = await getDAta("data");
+            return [a,b]
+        }
+
+
+        **This is a fully cuncurrent async code 
+        const makeAsync = async () =>{
+            const a =  getName("name");
+            const b =  getDAta("data");
+            const tasks =  Promise.all([a,b]);
+            return tasks;
+        }
+
+        makeAsync().then(log);
