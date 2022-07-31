@@ -921,6 +921,37 @@ DML
             select * from entradaSalidaDinero where
             pe.id = idPersonas
         );
+
+# FROM SUBQUERIES
+
+    **The basic idea is create a query that becomes a 
+    virtual table and from that virtual table make 
+    select from like you would do from any other table 
+    **The main difference is that 
+    the virtual table requires an alias, in this cases "subquery"
+    otherwise it wont work
+
+    select * from
+
+            (
+
+            select 
+                entradaSalidaDinero.idPersonas,
+                personas.nombre as 'nombre',
+                sum(entradaSalidaDinero.montoIE) as 'suma_total'
+            from personas 
+            inner join entradaSalidaDinero on 
+                (personas.id = entradaSalidaDinero.idPersonas) 
+            group by personas.id
+
+            ) as subquery
+    inner join usuarios on (usuarios.idPersona = subquery.idPersonas)
+    where idPersonas in (1,2,3);
+
+
+# CET (COMMON TABLE EXPRESSIONS)
+
+
 # HOW TO USE MYSQL WITH DOCKER
 
     *open mysql shell in the docker container
