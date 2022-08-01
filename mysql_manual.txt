@@ -335,6 +335,9 @@ DDL
         ALTER TABLE table_name ADD CONSTRAINT FK_name FOREIGN KEY (name) REFERENCES person(name)
     example:
         ALTER TABLE DROP CONSTRAINT FK_someconstraint
+    
+    example:
+        ALTER TABLE table_name MODIFY COLUMN column_name INT auto_increment PRIMARY KEY;
 
 
 # DROP TABLE (DDL)
@@ -949,8 +952,112 @@ DML
     where idPersonas in (1,2,3);
 
 
-# CET (COMMON TABLE EXPRESSIONS)
+# CTE (COMMON TABLE EXPRESSIONS)
 
+    **CTE are very similar to subqueries
+    **A CTE is a select query that creates more resultsets 
+    that can be used the following queries.
+
+    sintaxis:
+
+        **subquery can be a select/insert/update/delete
+
+        WITH cte_name as (subquery),
+        cte2_name as (subquery2),
+        cte3_name as (subquery3)
+
+        sql_statments
+
+    example:
+
+    **create the previous from subquery only using CTEs 
+
+    with aux_subquery as (
+            
+             select 
+                entradaSalidaDinero.idPersonas,
+                personas.nombre as 'nombre',
+                sum(entradaSalidaDinero.montoIE) as 'suma_total'
+            from personas 
+            inner join entradaSalidaDinero on 
+                (personas.id = entradaSalidaDinero.idPersonas) 
+            group by personas.id
+    )
+
+    select * from aux_subquery
+    inner join usuarios on (usuarios.idPersona = aux_subquery.idPersonas)
+    where idPersonas in (1,2,3);
+
+    **basically CTE allow us to execute queries and 
+    store them in variables
+
+
+# DML sentences  INSERT / UPDATE /DELETE
+
+    # ** copy a table into another table 
+        create table new_table as 
+        select * from origin_table;
+
+    # **copy a table without data 
+        create table new_table as 
+        select * from origin_table 
+        where id=-1
+
+    ***Copied tables DO NOT inherit primary keys , foreign keys , auto_increment etc 
+
+    **since id -1 doesnt exists the copies table will be empty 
+
+    # INSERT 
+        ** allows you to add new entries in a table 
+
+    sintaxis : 
+
+        INSERT INTO table_name (table_field1,table_field2)
+        VALUES (value1,value2)
+
+
+    # UPDATE 
+
+        UPDATE table_name SET 
+        column_name = expresion1,
+        column_name2 = expresion2
+        ...
+        WHERE condition
+
+    example:
+
+        update entradaSalidaDinero SET
+        montoIE=(montoIE+((montoIE*10)/100))
+        where fecha like '%-03-%' AND id <> 0;
+
+        **You have to reference a primary key in your update clause
+        as a safety meassure. In this case id is PK of this table
+
+    example :
+
+        update personas 
+        set nombre = (
+            select nombre from tempPersonas where personas.id = tempPersonas.id
+            )
+        where personas.id = (
+            select id from tempPersonas where personas.id = tempPersonas.id
+        )
+        and id != 0;
+
+    # DELETE 
+
+    DELETE from table where conditions;
+
+    example :
+
+        DELETE from  usuarios us
+        where exists (
+                select * from personas where us.idPersona = personas.id
+            ) and id != 0
+
+     **You have to reference a primary key in your delete clause
+        as a safety meassure. In this case id is PK of this table
+        
 
 # HOW TO USE MYSQL WITH DOCKER
 

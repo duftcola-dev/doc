@@ -1,0 +1,68 @@
+## GO USER MANUAL
+
+# Initializing a Go module 
+
+    **The go mod init command creates a go.mod file to track your code's dependencies. 
+
+    go mod init url/file_name 
+
+    example :
+
+        go mod init example.com/hello 
+
+    **The go mod tidy synchronizes the required deppendencies
+    but do not track them . 
+    **Tracking is made but the go.mod file
+
+        go mod tidy
+
+    go files consists in the following parts : 
+
+        - package declaration 
+        - import packages 
+        - code 
+
+
+    **Specify the import route of a package and track it.
+    example :
+
+        **a file requires anotuher modue
+        ** //main.Go
+
+        import (
+            "example.com/another_package"
+        )
+    
+        **import the the package :
+
+            go mod edit -replace example.com/another_package=<relative_path_to_package_folder>
+
+        example:
+
+            go mod edit -replace example.com/another_package=../other_package_folder 
+
+        then run :
+
+            go mod tidy 
+            
+            **in order to synchronize
+
+
+
+
+-------------------------------------------------------------------------
+
+# ERROR HANDLING 
+
+    **functions in go can retun several values
+
+    func Hello(m string) (string,error) {  //specify the return of multiple values
+
+	if m == "" {
+		return "", errors.New("Hello requires at leas one string param") // here we return "" and an error if m == ""
+	}
+	temp := "Hello " + m + " , welcome"
+	return temp, nil // here we return the result and nil 
+}
+
+    ** The idea is that if the user sees the second value of the function is nil. Then that means there is no error.
