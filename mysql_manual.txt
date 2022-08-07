@@ -56,6 +56,33 @@
     ** To check the current list of users :
     SELECT user,host FROM mysql.user;
        
+    
+**We have 4 main categories of queries :
+
+        DDL **data definision
+            - CREATE
+            - ALTER
+            - DROP
+            - TRUNCATE
+        DML **data manipulation
+            - SELECT
+            - INSERT 
+            - UPDATE 
+            - DELETE
+        DCL **data control
+            - GRANT 
+            - REVOKE 
+        TCL **TRANSACTION CONTROL 
+            - BEGIN 
+            - COMMIT 
+            - ROLLBACK 
+            - SAVEPOINT
+
+
+---------------------------------------------------------------------------------
+DCL
+---------------------------------------------------------------------------------
+
 
 # ADDING NEW USERS
 
@@ -64,27 +91,56 @@
         or 
 
         ALTER USER 'user'@'localhost' IDENTIFIED BY 'new_password';
-        FLUSH PRIVILEGES;
+        FLUSH PRIVILEGES;  
+
+    **show users 
+
+        use mysql;
+        select user , host from user;
 
 
 # GRANTING ACCESS TO SCHEMA TO A USER
 
-    **as root :
+    **There are 2 main function for privileges :
+        - GRANT
+        - REVOKE
 
-    GRANT permissions, , ,  ON SCHEMA schema_name TO user_name
+    
+    sintaxis: **as root :
 
-    example :
+    GRANT [CREATE,SELECT,UPDATE,INSERT,DELETE]  ON SCHEMA schema_name TO user_name
 
-        GRANT SELECT,UPDATE,INSERT,DELETE ON SCHEMA.* TO 'user'@'localhost'
+    example grant privileges over a schema:
 
-    **or grant all privileges:
+        GRANT CREATE,SELECT,UPDATE,INSERT,DELETE ON SCHEMA.* TO 'user'@'localhost'
+
+        **or grant all privileges:
 
         GRANT ALL PRIVILEGES ON SCHEMA.* TO 'user'@'localhost'
 
-    **To grant privileges only to an specific table in that schema use:
+        **To grant privileges only to an specific table in that schema use:
 
         GRANT ALL PRIVILEGES ON SCHEMA.table_name TO 'user'@'localhost'
 
+    **revoking privileges 
+
+        **revoking all privileges 
+        
+        REVOKE ALL , GRANT OPTION  FROM usuario@localhost
+
+    **rename user 
+
+        rename user user@localhost to another_user_name@localhost
+
+    **delete user 
+
+        drop user@localhost
+        
+
+#  GRANTING / REVOKING PRIVILEGES FROM workbench
+
+    **as root --> Administration --> Users and privileges 
+    **It is quite graphical and straight forward from here
 
 # CREATING/IMPORTING A DATABASE
 
@@ -148,31 +204,10 @@
 
 # SQL QUERIES
 
-    **We have 4 main categories of queries :
-
-        DDL **data definision
-            - CREATE
-            - ALTER
-            - DROP
-            - TRUNCATE
-        DML **data manipulation
-            - SELECT
-            - INSERT 
-            - UPDATE 
-            - DELETE
-        DCL **data control
-            - GRANT 
-            - REVOKE 
-        TCL **TRANSACTION CONTROL 
-            - BEGIN 
-            - COMMIT 
-            - ROLLBACK 
-            - SAVEPOINT
-
-
 ---------------------------------------------------------
 DDL
 ---------------------------------------------------------
+
 
 # TABLE CREATION SINTAX:
 
@@ -400,11 +435,16 @@ DDL
         database and generating(calculating) total_cost based on the data of other columns.
 
 
+------------------------------------------------------------------------------------------------
+TRIGGERS 
+------------------------------------------------------------------------------------------------
+
+
 # CREATE A TRIGGER
 
     **A trigger is a function "triggered" after or before and action is
     executed on a table in a database. 
-    ** And action can be an operation like INSERT , UPDATE, DELETE , CREATE etc
+    ** And action can be an operation like INSERT , UPDATE, DELETE 
     **Triggers are linked to a table.
     **In order to create a trigger you must be a superuser
 
@@ -431,9 +471,11 @@ DDL
         END IF;
 
 
+
 --------------------------------------------------------------------------------
 DML 
 -------------------------------------------------------------------------------- 
+
 
 # BASIC INSERT VALUE INTO TABLE 
 
@@ -549,6 +591,47 @@ DML
 	    where nombre in ('JUAN PEREZ GARCIA','ARACELI ORTIZ PINEDO')
         );
 
+
+# SELECT + GROUP BY + HAVING + ORDER BY 
+
+    sintaxis 
+
+    SELECT *
+    FROM table_name
+    WHERE condition
+    GROUP BY 
+    HAVING 
+    ORDER BY
+
+    **where is a filter pre-agrupations
+    **having is a filter after agrupation
+    **The having clause is used to make search conditions 
+    for agregation groups made the group by.
+    **Having can only be use after group by.
+
+
+    example :
+
+        select distinct personas.nombre,entradaSalidaDinero.montoIE, entradaSalidaDinero.fecha from
+        personas inner join entradaSalidaDinero on (personas.id = entradaSalidaDinero.idPersonas)
+        where entradaSalidaDinero.fecha > 2018
+        group by personas.nombre,entradaSalidaDinero.montoIE,entradaSalidaDinero.fecha
+        having 	max(entradaSalidaDinero.montoIE) > 1500
+        order by entradaSalidaDinero.montoIE limit 100;
+
+
+# WITH ROLLUP
+
+    select personas.nombre,entradaSalidaDinero.montoIE,sum(entradaSalidaDinero.montoIE) as 'total' from
+    personas inner join entradaSalidaDinero on (personas.id = entradaSalidaDinero.idPersonas)
+    where entradaSalidaDinero.fecha > 2018
+    group by personas.nombre,entradaSalidaDinero.montoIE with rollup
+    having 	max(entradaSalidaDinero.montoIE) > 1500;
+
+    **Roll up creates a summary of the agragation functions 
+    used in the select. In this case there is only one agragation function :
+    sum(entradaSalidaDinero.montoIE) as 'total' so rollup shows 
+    a summary of this agregation
 
 # OPERATOR REGEXP / LIKE
 
@@ -1057,7 +1140,275 @@ DML
 
      **You have to reference a primary key in your delete clause
         as a safety meassure. In this case id is PK of this table
+
+
+# AGREGATION FUCNTIONS 
+
+    **get the maximun ,minumun ,avg of a list 
+    **The list must output one single result 
+
+    example :
+
+        select monotIE from entradaSalidaDinero;
+
+        **A list with more thatn one column wont work 
+
+    AGREAGTION KEY WORDS :
+
+        **ALL is implicit by default. It uses all the elements of the list
+        **DISTINCT selects the elements from the list that do not repeat
+
+        AVG [ALL | DISTINCT] expression  
+        SUM [ALL | DISTINCT] expression
+        MAX [ALL | DISTINCT] expression
+        MIN [ALL | DISTINCT] expression
+        COUNT [ALL | DISTINCT] expression
+
+    example :
+
+        select 
+        count(*) as 'elementos', 
+        max(montoIE) as 'max_valor', 
+        min(montoIE) as 'min_valor', 
+        round(avg(montoIE),2) as 'avg',
+        round(sum(montoIE),2) as 'total' 
+        from entradaSalidaDinero where
+        fecha > 2018;
+
+
+# OPERATOR OVER
+
+    **over functions or window fuctions can be used with any agregation function
+    **over allows to create additional columns as summary of the result of agregation functions
+    like sum,count,max,avg etc 
+    **Allows to use agregation functions without group by.
+
+    example :
+
+        select idPersonas,fecha,montoIE,sum(montoIE) over() as 'total',count(*) over() as 'registros' 
+        from entradaSalidaDinero
+        where year(fecha)=2018 and month(fecha)=1;
+
+
+    **If we didnt use the function over the previous query would have to use group by :
+    **example :
+
+        select idPersonas,fecha,montoIE,sum(montoIE) as 'total',count(*) as 'registros' 
+        from entradaSalidaDinero
+        where year(fecha)=2018 and month(fecha)=1
+        group by montoIE,fecha,idPersonas;
+
+
+    **You can make subdivisions or partitions making groups of data based on on parameter.
+    **example : We want to make partitions of montoIE based on the id
+    
+    idPersonas,
+    fecha,
+    montoIE,
+    sum(montoIE) over() as 'total',
+    count(idPersonas) over() as 'total personas',
+    count(idPersonas) over(partition by idPersonas) as 'total specifi id'
+    from entradaSalidaDinero
+    where year(fecha)=2018 and month(fecha)=1;
+
+    **In this with 'count(idPersonas) over(partition by idPersonas)' we are counting 
+    how many ids are from each id .
+
+
+    **example : 
+    **partitions with order by 
+
+    select 
+        idPersonas,
+        fecha,
+        montoIE,
+        sum(montoIE) over(partition by idPersonas order by montoIE desc) as 'total por persona',
+        count(idPersonas) over() as 'total personas',
+        count(idPersonas) over(partition by idPersonas) as 'total specifi id'
+        from entradaSalidaDinero
+    where year(fecha)=2018 and month(fecha)=1;
+
+
+    **example::
+    **partitions with inner join
+
+    select personas.nombre,ingresosEgresos.descripcion,entradaSalidaDinero.montoIE,
+    sum(entradaSalidaDinero.montoIE) over() as 'monto total',
+    count(personas.id) over() as 'registros total',
+    count(personas.id) over(partition by personas.id) as 'registros por persona',
+    sum(entradaSalidaDinero.montoIE) over(partition by personas.nombre order by entradaSalidaDinero.montoIE) as 'monto por persona'
+    from entradaSalidaDinero 
+    inner join personas on entradaSalidaDinero.idPersonas = personas.id
+    inner join ingresosEgresos on entradaSalidaDinero.idIngresosEgresos = ingresosEgresos.id
+    where year(entradaSalidaDinero.fecha)=2018 and month(entradaSalidaDinero.fecha)=1;
+
+# CREATING VIEWS 
+
+    VIEW vs TEMPORARY TABLE 
+
+        - A VIEW is persistent accross sessions.
+        - A TEMPORARY TABLE is deleted after the session is over.
+        - A view requires more processing since its run each time its called.
+        - A temporary table stores the result of the query that creates it.
         
+
+    sintaxix :
+
+        CREATE VIEW personas_view as SELECT QUERY
+    
+    example :
+
+    create view personas_montoIE as 
+        SELECT 
+        personas.id,
+        personas.nombre,
+        entradaSalidaDinero.montoIE,
+        sum(entradaSalidaDinero.montoIE) over(partition by personas.nombre) as "total",
+        avg(entradaSalidaDinero.montoIE) over(partition by personas.nombre) as "avg",
+        max(entradaSalidaDinero.montoIE) over(partition by personas.nombre) as "max",
+        min(entradaSalidaDinero.montoIE) over(partition by personas.nombre) as "min"
+        from personas inner join entradaSalidaDinero on entradaSalidaDinero.idPersonas = personas.id;
+
+        **select query execution time 0.0096 sec
+    
+    # delete view if exists view_name
+
+
+----------------------------------------------------------------------------------
+STORED PROCEDURES
+----------------------------------------------------------------------------------
+
+    **A stored procedure is just a function in MYSQL 
+    **Stored procedure are precompliled executable code.
+    **Queries need to be compiled and then executed.
+    **Therefore stored procedures are faster than queries.
+
+    **Stored procedures use can use the following logic 
+
+    IF | ELSEIF  | ELSE 
+    CASE | WHEN | ELSE 
+    WHILE | DO LOOP
+    REPEAT | UNTIL | END REPEAT 
+    DECLARE CURSOR FOR 
+    DECLARE | HANDLER
+
+    sintaxis :
+
+        **We are  setting as delimiter of
+        our procedure the character // 
+
+        DELIMITER //
+        CREATE PROCEDURE procedure_name()
+        BEGIN 
+            SELECT QUERY
+        END//
+        DELIMITER ;
+
+        **After the procedure is ended we reset the delimiter character back to ;
+        **This is a void procedure --> procedure_name()
+        ** is a function that doesnt use parameters
+
+        example :
+
+            delimiter //
+            CREATE procedure hello_world()
+            BEGIN 
+                SELECT 'Hello world' as hello;
+            END//
+            delimiter ; 
+
+         execute / call stored procedure :
+
+            call hello_world();
+
+
+    # Stored procedures with variables.
+        **The key word declare creates varibles.
+        **The key workd INTO assigns expresion result to variable
+
+    DELIMITER //
+    CREATE PROCEDURE items()
+    BEGIN 
+
+        DECLARE n_items int;
+
+        SELECT COUNT(*) INTO n_items
+        FROM usuarios ;
+
+        SELECT n_items as 'usuarios';
+
+    END//
+    DELIMITER ;
+
+    call items();
+
+
+    # PROCUDURES WITH PARAMETERS 
+
+    ** the key word in are paremeters with pass to the procedure
+    ** the key word out indicated the values the procedure returns
+
+    DELIMITER // 
+    CREATE PROCEDURE procedure_name(in p_nombre varchar(50),out nombre varchar(50),out fecha date,out monto decimal(6,2))
+    BEGIN 
+
+        SELECT personas.nombre,entradaSalidaDinero.montoIE,entradaSalidaDinero.fecha 
+        from personas inner join entradaSalidaDinero ON personas.id = entradaSalidaDinero.idPersonas
+        WHERE personas.nombre LIKE '%p_nombre%';
+    
+    END//
+    DELIMITER ;
+
+    # call procedure with parameters
+    **the @ catchas return values
+
+	drop procedure if exists procedure_name;
+
+    DELIMITER // 
+    CREATE PROCEDURE procedure_name(in i_id varchar(50),out nombre varchar(50),out correo varchar(50),out o_id int)
+    BEGIN 
+		declare result_id int;
+        
+        SELECT personas.id into result_id
+        from BD_Pendientes.personas
+        WHERE personas.id = i_id;
+        
+        SELECT personas.nombre into nombre
+        from BD_Pendientes.personas
+        WHERE personas.id = i_id;
+        
+        SELECT personas.correo into correo
+        from BD_Pendientes.personas
+        WHERE personas.id = i_id;
+        
+        SELECT personas.id into o_id
+        from BD_Pendientes.personas
+        WHERE personas.id = i_id;
+        
+		if result_id is null then
+			set nombre="Not found";
+            set correo="Not found";
+            set o_id=0;
+		end if;
+    END//
+    DELIMITER ;
+
+    call procedure_name(-1,@nombre,@correo,@o_id);
+    select @nombre,@correo,@o_id;
+
+
+        **Procedures cannot return tables , they can return single values in their
+        return variables 
+
+
+
+    # delete/drop procedure 
+
+        drop procedure if exists procedure_name;
+
+
+
+
 
 # HOW TO USE MYSQL WITH DOCKER
 
