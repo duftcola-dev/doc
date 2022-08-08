@@ -1407,7 +1407,288 @@ STORED PROCEDURES
         drop procedure if exists procedure_name;
 
 
+# CASE CLAUSE
 
+    **case is similar to if else
+
+    sintaxis : 
+
+        CASE 
+
+            when conditions then 
+                do something;
+            when conditions then
+                do something;
+            .
+            .
+            .
+            else
+                do something if no condition match;
+        END CASE;
+
+    example:
+
+        DELIMITER //    
+        create procedure get_pendiente(in id_pendiente int,out nombre_pendientes varchar(50),out total_pendientes int,out message varchar(100))
+        BEGIN
+
+            select personas.nombre into nombre_pendientes  from personas where id_pendiente = personas.id;
+            select count(*) into total_pendientes
+            from pendientes
+            INNER JOIN personas on personas.id = pendientes.idPersonaAsignado
+            WHERE personas.id = id_pendiente or
+            personas.id = id_pendiente;
+            
+            case 
+                when (total_pendientes>0 and total_pendientes<50) then
+                    set message="YOU HAVE SOME TASKS";
+                when (total_pendientes>50) then
+                    set nombre_pendientes = @nombre_pendientes;
+                    set total_pendientes = @total;
+                    set message="YOU HAVE MANY TASKS !";
+                else
+                    set nombre_pendientes = "NOT FOUND";
+                    set	message="NOT FOUND";
+            end case;
+                    
+                    
+        END//
+        DELIMITER ;
+            
+
+        call get_pendiente(1,@nombre_pendientes,@total_pendientes,@message);
+        select @nombre_pendientes,@total_pendientes,@message;
+
+
+# WHILE CLAUSE
+
+    **while is used to create loops inside stored procedures 
+
+    drop procedure if exists loop_while;
+
+        DELIMITER // 
+        CREATE PROCEDURE loop_while(out result varchar(50))
+        BEGIN
+            declare counter int default 0 ;
+            declare c_limit int default 100;
+            declare s varchar(50) default "";
+
+            while counter < c_limit do 
+                set counter=counter+1;
+            end while;
+
+            set s=concat(s,"count =",counter,"|");
+            select  s into result;
+        END // 
+        DELIMITER ;
+
+    call loop_while(@result);
+    select @result;
+
+
+-----------------------------------------------------------------------------------------------
+CURSORS
+-----------------------------------------------------------------------------------------------
+
+
+    PROS
+    **Cursors are used inside stored procedures
+    **Cursors allow to retrieve information from tables row by row 
+    **Cursors can be faster than while loops but more verbose
+    **Using cursors allow cuncurrency
+    CONS 
+    **They exists in stored procedures the they occupy memory 
+    **They use more bandwith in the server 
+    **Using cursor repeatedly can reduce the speed of the server
+
+    DROP PROCEDURE IF EXISTS CURSORES;
+    DELIMITER //
+    CREATE PROCEDURE CURSORES(out result int)
+    BEGIN
+        -- create variables
+        DECLARE id_persona_var int;
+        DECLARE telefono_var varchar(30);
+        DECLARE row_not_found tinyint default false;
+        DECLARE update_count int default 0;
+        
+        -- declaring cursor 
+        -- asing cursor to columns
+        DECLARE id_persona_cursor CURSOR for
+        SELECT id,telefono from personas
+        where correo like '%hotmail%';
+        
+        -- declare error handling
+        -- This handler will set row_not_found to True when the cursor arrives to
+        -- the end of the table
+        DECLARE continue handler for not found set row_not_found = true;
+        
+        -- open cursor 
+        open id_persona_cursor;
+        while row_not_found = false do
+            fetch id_persona_cursor into id_persona_var,telefono_var;
+            if length(telefono_var) > 0 then
+                update BD_Pendientes.pendientes set pendientes.observaciones=telefono_var
+                where pendientes.idPersonaAsignado=id_persona_var;
+            else	
+                update BD_Pendientes.pendientes set pendientes.observaciones="SOLICITAR TELEFONO"
+                where pendientes.idPersonaAsignado=id_persona_var;
+                set update_count = update_count+1;
+            end if;
+        end while;
+        -- closing cursor
+        close id_persona_cursor;
+        -- returning results
+        select update_count into result;
+    END//
+    DELIMITER ;
+
+
+    call CURSORES(@result);
+    select @result
+
+
+# STORED FUNCTIONS 
+
+    Stored function :
+        - can return only one value 
+        - cannot execute intructions update ,delete , insert 
+    Stored procedures :
+        - can return many values 
+        - can executer insert ,update ,delete 
+
+
+    sintaxis:
+
+        DELIMITER // 
+            create function function_name(id_ingreso int) returns return_type
+            READS SQL DATA
+            DETERMINISTIC
+            BEGIN
+                <function logic here>
+            END//
+        DELIMITER ; 
+
+        **call the function 
+
+        select statament,function_name() from table;
+
+    example :
+
+    drop function if exists function_ingresos_egresos;
+    
+    DELIMITER // 
+    create function function_ingresos_egresos(id_ingreso int) returns decimal(8,2)
+    READS SQL DATA
+    DETERMINISTIC
+    begin
+        declare sumatoria decimal(8,2);
+        
+        select sum(montoIE) into sumatoria from entradaSalidaDinero where 
+        idIngresosEgresos=id_ingreso;
+        if sumatoria > 0 then 
+            return sumatoria;
+        else 
+            return 0;
+        end if;
+        
+    end//
+    DELIMITER ; 
+
+    select id,descripcion,function_ingresos_egresos(id) from ingresosEgresos;
+--------------------------------------------------------------------------------------
+OPRIMIZATION
+--------------------------------------------------------------------------------------
+
+# INDEXES / OPTIMIZATION
+
+    **indexes are used to find specific column values quickly
+    ** without and index mysql must begin with the first row and go 
+    through the entire table to find relevant rows.
+    ** If the table has an index mysql can determine the position to search in the middle
+    of the data without having to look at all the data
+
+    Indexes allow to :
+
+        * To find the rows matching a WHERE clause quickly.
+        * All primary keys have and associate index by default.
+
+    FOREIGN KEY OPTIMIZATION 
+
+        - IF your table has many columns and the queries have many different combinations
+        it may be more efficient to split this table into smaller tables each with 
+        a few columns with the least frequently used data.
+
+        - This way each table can have its own primary key for data lookup
+
+# CREATING COLUMN INDEXES prefix 
+
+    **In a string column, a column that uses varchar type 
+    you can create an index to the first N characters of the values of column 
+    so when a data lookup is done is not nescessary to compare each char of the string
+
+    example :
+
+        CREATE TABLE test (
+            name varchar(50) ,
+            index(name(10))
+        )
+
+        ** This will create an index to the first 10 characters of name.
+
+# MUTIPLE COLUMNS INDEX 
+
+    **Mysql can index up to 16 columns together.
+    **Mysql can use multiple columns indexes fo queries that test all the columns
+    in the index .
+    **A multiple-column index can be considered a sorted array.
+
+    example :
+
+        CREATE TABLE test (
+            id         INT NOT NULL,
+            last_name  CHAR(30) NOT NULL,
+            first_name CHAR(30) NOT NULL,
+            PRIMARY KEY (id),
+            INDEX name (last_name,first_name)
+        );
+
+        **queries that aim at last_name and first_name will run faster.
+
+# CHECK OPTIMIZATION WITH CLAUSE EXPLAIN
+
+    **The EXPLAIN statement provides information about how mysql processes 
+    a stament giving you info on how your indexes are being used.
+
+    **With the help of EXPLAIN, you can see where you should add indexes 
+    to tables so that the statement executes faster by using indexes to find rows.
+
+
+    example:
+
+         EXPLAIN select * from(
+            select 
+                entradaSalidaDinero.idPersonas,
+                personas.nombre as 'nombre',
+                sum(entradaSalidaDinero.montoIE) as 'suma_total'
+            from personas 
+            inner join entradaSalidaDinero on 
+                (personas.id = entradaSalidaDinero.idPersonas) 
+            group by personas.id
+
+            ) as subquery
+            inner join usuarios on (usuarios.idPersona = subquery.idPersonas)
+            where idPersonas in (1,2,3);
+
+    ** This outputs the following data :
+
+    '1', 'PRIMARY', 'usuarios', NULL, 'ALL', 'FK_idUsuariosPersonas', NULL, NULL, NULL, '1', '100.00', NULL
+    '1', 'PRIMARY', '<derived2>', NULL, 'ref', '<auto_key0>', '<auto_key0>', '4', 'BD_Pendientes.usuarios.idPersona', '10', '100.00', NULL
+    '2', 'DERIVED', 'personas', NULL, 'index', 'PRIMARY', 'PRIMARY', '4', NULL, '11', '100.00', NULL
+    '2', 'DERIVED', 'entradaSalidaDinero', NULL, 'ref', 'FK_idPersonas', 'FK_idPersonas', '4', 'BD_Pendientes.personas.id', '45', '100.00', NULL
+
+    ** We can see there are 2 foreing keys one of then referencing a primary key 
+    ** This help us to notice we probably should add an index to this 2 foreign keys
+    to optimize the data look up
 
 
 # HOW TO USE MYSQL WITH DOCKER
