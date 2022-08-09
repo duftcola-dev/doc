@@ -170,6 +170,18 @@ DCL
 
 # CREATING  A DATABASE THAT ALLOWS ADDITIONAL / SPECIAL CHARACTERS
 
+    **Show the available character sets in the current version of SQL 
+    **It is better to this in workbench
+
+        show char set
+
+    **Show the characters set curently being used by the server 
+
+        show variables like 'character_set_server'; **set used by the whole server
+        show variables like 'character_set_database'; **set used by the current database
+        show variables like 'collation_database'; **callation used by the current database
+ 
+
     CREATE DATABASE Database_name CHARACTER SET charset_name_here COLLATE collation_name_here 
 
     ** we can also add these features in a database that already exists 
@@ -465,10 +477,57 @@ TRIGGERS
 
     example :
 
-        CREATE TRIGGER agecheck BEFORE INSERT ON people FOR EACH ROW 
-        IF NEW.age < 0 THEN 
-            SET NEW.age = 0; 
-        END IF;
+        drop tigger if exists persona_before_update;
+
+        DELIMITER // 
+        CREATE TRIGGER persona_before_update 
+        BEFORE UPDATE ON personas FOR EACH ROW
+        BEGIN
+            SET NEW.correo=lower(new.correo);
+        END // 
+        DELIMITER ; 
+
+        ** This trigger sets correo on 
+
+    example 2:
+
+        drop trigger if exists update_insert_persona ;
+
+        delimiter //
+        create trigger update_insert_persona 
+        after insert on personas for each row
+        begin 
+          
+            insert into usuarios(nombre,password,idPersona) VALUES 
+                (new.nombre,"temporary_table",new.id);
+        end // 
+        delimiter ;
+
+        **This trigger creates an user for each new personas
+
+
+# SIGNALS 
+
+    **singnals are like console logs that alow to send messages or alerts
+    **They can be used in
+        - procedures 
+        - functions 
+        - if statements 
+
+    **This sintaxis is quiete simple 
+
+    SIGNAL SQLSTATE 'sql_error_code' SET MESSAGE_TEXT = 'some message you want to sent';
+
+    example:
+
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An error occured';
+    
+    example :
+
+        SIGNAL SQLSTATE '01000' SET MESSAGE_TEXT = 'New user added';
+
+    **01000 are warning class SIGNALS
+    **45000 are error class SIGNALS
 
 
 
@@ -1575,7 +1634,7 @@ CURSORS
     example :
 
     drop function if exists function_ingresos_egresos;
-    
+
     DELIMITER // 
     create function function_ingresos_egresos(id_ingreso int) returns decimal(8,2)
     READS SQL DATA
@@ -1690,6 +1749,45 @@ OPRIMIZATION
     ** This help us to notice we probably should add an index to this 2 foreign keys
     to optimize the data look up
 
+
+-------------------------------------------------------------------------------------------------
+
+TRANSACTIONS
+
+-------------------------------------------------------------------------------------------------
+
+    **By default mysql works in autocommit mode .
+    This is means all queries are execute once the query is valid.
+
+    **Transactions allow us to handle errors during execution time of query 
+    ** the commit key word stores the result of the opration commiting the changes.
+    ** the rollback key word aborts any change .
+
+
+    sintaxis :
+
+    delimiter //
+    create procedure make_transaction()
+    begin
+        **flag used for the transaction 
+            declare sql_error tinyint default false; 
+        
+        **Create a handler to set the flag to true if an error happends
+            declare continue handler for sqlexception set sql_error = true
+        **begin the transaction
+            start  transaction;
+
+            **SQL statement here (insert,update,delete,create)
+
+        if sql_error = false then 
+            commit; **transaction executed
+        else 
+            rollback; **transaction aborted
+        endif
+    end//
+    delimiter;
+
+    call make_transaction();
 
 # HOW TO USE MYSQL WITH DOCKER
 
