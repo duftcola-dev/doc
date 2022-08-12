@@ -1,0 +1,192 @@
+# ALEMBIC USER MANUAL 
+
+0.0 # INSTALLATION 
+
+    **in a venv
+    **installation proceeds like any python lib
+
+    pip install alembic --upgrade pip 
+
+    **All operations with allembic will proceed after the command
+
+    alembic init .
+
+    **This will generate a generic template and
+      a alembic.ini file.
+    **This is a file that the alembic script looks for 
+    when invoked.
+
+    **The most relevant part of the ini file is the driver url :
+
+        sqlalchemy.url = driver://user:pass@localhost/dbname
+
+        replace this for your database driver and credentials:
+
+            sqlalchemy.url = mysql://test:test_pass@localhost/test
+
+            or
+
+            sqlalchemy.url = postgresql://scott:tiger@localhost/test
+
+    **optionally you can installed it with 
+
+    pip install -e .
+
+
+
+
+0.1 # DESCRIPTION
+
+    Alembic provides for the creation, management, 
+    and invocation of change management scripts for a 
+    relational database, using SQLAlchemy as the underlying engine.
+    
+1.0 # THE MIGRATION ENVIRONMENT
+
+
+    Alembic creates a migration environment that is created once 
+    and then mantained . This environment keeps track of the changes 
+    of you relational database in manner similar to git repository.
+
+    The migration enviroment must have the following structure :
+
+        yourproject/
+            alembic/
+                env.py
+                README
+                script.py.mako
+                versions/
+
+    ** versions/ contain scripts that will keep track of 
+    the changes in your database.
+
+
+    1.1 **Generated the migration envirnoment : 
+
+        sintaxis:
+
+            alembic init env_name 
+
+        example : 
+
+            alembic init alembic
+        
+        example 2 : 
+
+            alembic init ./some_route/alembic
+
+    
+    1.2 **We can also generate environments from templates.
+          Alembic comes with a few templtes by default .
+
+          **generic_template:
+            alembic init --template generic alembic
+
+          **async_template:
+            alembic init --template async alembic
+
+          **multi_template:
+            alembic init --template multidb alembic
+
+    1.3 **Create your first migration script.
+
+            sintaxis:
+
+            alembic revision -m "script title/header or topic here"
+
+            example:
+
+            alembic revision -m "create users table"
+
+            **Every script generated has the :
+
+                - upgrade()
+                - downgrade() 
+
+            This functions allow us to travel accroes cahnges made in the database.
+            Upgrade add new features and changes.
+            Downgrade allow to go to previous versions.
+
+
+2.0 # ADDING CONTENT AND DIRECTIVES 
+
+    **Once the first migration script is created add a tale to our database.
+    **Upgrade creates a table.
+    **Downgrade deletes it.
+
+    example:  
+
+        def upgrade() -> None:
+    op.create_table(
+        'users',
+        sa.Column("id",sa.Integer,primary_key=True,autoincrement=True),
+        sa.Column("name",sa.VARCHAR(20),nullable=False),
+        sa.Column("email",sa.VARCHAR(50),nullable=False),
+        sa.Column("telephone",sa.VARCHAR(50),nullable=False),
+    )
+
+
+    def downgrade() -> None:
+        op.drop_table("users")
+
+    
+    2.1 **Apply the migration and its changes to the database 
+
+        **This will launch the most recent upgrade migration
+
+            alembic upgrade head
+
+        **Refer to specific migration by using the first characters pf its id.
+
+            alembic upgrade abc12
+
+            or 
+
+            alembic downgrade abc11
+
+        **Relative migration
+
+            alembic  upgrade +1
+            
+            or
+
+            alembic  upgrade +2 **2 migration ahead of the current one
+
+            or 
+
+            alembic downgrade -1
+
+            or
+
+            alembic upgrade abc12 +2
+            
+        **Downgrade back to nothing (full restart)
+
+            alembic downgrade base 
+
+        **Upgrade to latest 
+
+            alembic upgrade head
+    
+    
+    2.2 **Getting information about the current migration
+
+        **This will display the head of the current migration
+        alembic current
+
+        **Display extra info with :
+
+        alembic history 
+
+        alembic history --verbose 
+
+        ** hte -r allows to see slices of history 
+
+        alembic history -r -3:current
+
+
+
+
+
+
+        

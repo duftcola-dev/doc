@@ -1,0 +1,289 @@
+# GIT USER MANUAL 
+
+1.0 # install git (for linux)
+
+    apt-get install git
+    
+    1.1 **indetify yourself as a user 
+    
+        git config --global user.name "user_name" 
+        git config --global user.email "useremail@hotmail.com"
+
+
+2.0 # Create a git repo 
+
+    **in a folder
+    git init 
+
+    2.1 # Add files to the staging area 
+
+        **All files within the add command 
+        are tracked file 
+
+        git add --all 
+
+        or 
+        
+        git add file_name 
+
+    2.2 # Commit changes 
+
+        git commit -m "comment or decription" 
+
+        **add tags to your commits 
+        **Tags are ususally added after the commit.
+        
+        sintanxis : 
+
+            git tag vsome_number
+
+        example :
+
+            git tag v10
+
+        
+        **Add tag to an specific commit 
+
+            git tag v10.0.0 commit_id
+
+    
+    2.3 # Removing tracking from files. 
+
+        - git rm is the complete opposite of git add 
+        - files are removed from the working directory 
+        - files removed with git rm are no longer tracked.7
+
+        git rm file_name 
+
+    2.3 # Cleaning untracked files 
+
+        - removes untracked files -
+        - untracked files are files that
+          where not selected by the git add command.
+        - git clean is similar to git rm but eliminating 
+          all untracked file 
+
+        **test execution (wont delete files) to show the possible outcome
+
+            git clean -n
+
+        **executing of git clean 
+
+            git  clean -f 
+
+
+    2.4 # Reverting changes 
+
+        **Git reverts deletes or undoes commit 
+        **If you make a git commit and you want to undo 
+          all the commited changes then you must use git revert 
+
+        git revert commit_id
+        
+        **commit id  should be the id of the last commit made.
+        This will revert the last commit and create a new HEAD 
+        with the data that existed previous the commit .
+
+    
+    2.5 # Reset 
+
+        ** git reset allows to move the head and main(master) reference 
+        accross any commit effectively making that commmit the new head and main
+
+        ** This is usefull when we want to "go" back to and specific commit.
+
+        git reset commit_id_number
+
+    
+    2.6 # Moving accross changes / branches 
+
+        **git checkout is the main main mechanism of 
+          movement accross commits.
+        **git checkout will only move the pointer to certain place...
+        **This allows to see the data of that commit .
+        **The head and main reference do not change with git checkout.
+        **Therefore git checkout is a visualization tool.
+
+        git checkout commit_id / branch name
+
+
+    2.7 # Restoring file 
+
+        **Git restore is simple . It restore delete files in
+        the working giirectory 
+
+        git restore file name
+
+
+3.0 # Working with branches
+
+    **Branches are copies of your current directory 
+    where you can work in parallel.
+
+    3.1 # create a branch 
+
+        git branch branch_name
+
+        or
+
+        git branch -b branch_name 
+        ** create branch and move
+
+        or 
+        
+        git switch branch_name
+
+        or 
+
+        git switch -c branch_name
+        **create and move to branch
+
+    3.2 # travel to branches 
+
+        git checkout branch_name 
+
+        **additionally you can also use git switch -c branch_name
+        to change of branch.
+
+        **git checkout also allows to travel to commits made .
+        how ever remeber that checkout doesnt move the HEAD pointer nor
+        main 
+
+            git checkout commit_id
+
+        example --> how to recover data from a commit .
+
+            git checkout commit_with_data_id   ** got to x commit 
+            git checkout -b temp_branch         **create a parallel branch 
+            git merge from_previous_branch      ** copy/merge the data of x commit into new branch
+            git checkout previous_branch     ** return to prev branch
+            git checkout HEAD               ** return to HEAD 
+
+    3.3 # delete branch 
+
+        **branches cannot be delted if there are uncommited changes in it.
+
+        git branch -d branch_name
+
+    3.4 merge data into branch
+
+        **in branch test
+        ** this will merge the content of develo into branch.
+
+        git merge develop
+
+
+4.0 # Creating aliases for commands 
+
+    ** create an alias for the command git status 
+        sintanxis :
+
+            git config --global alias.<alias name here> "command linked to the alias"
+
+        example 
+
+            git config --global alias.status "git status"
+
+            ** now just writing status should output git status
+
+
+4.0 # Add a remote repository (github)
+
+    4.1 Create a repository in github.com 
+
+    4.2 Get the remote repository url 
+
+        example : 
+            https://github.com/duftcola-dev/FlaskPortfolio
+
+    4.3 Add the remote repository to your local repository 
+
+        sintaxix:
+
+            git remote add label url
+
+        example :
+
+            git remote add origin https://github.com/duftcola-dev/FlaskPortfoli
+
+
+        **remove the current origin and change it for other 
+
+            git remote rm origin
+
+            git remote add origin another_url
+
+        **The command remote add __labe__ adds a remote repository under a 
+        label  ususally with the name origin although any name can be used.
+
+        **now you can make push and pull using 
+
+            git pull **download data from remote repo 
+            git push **upload data in local repo
+        
+
+        ** git push -u origin --all
+        **push all created branches in the local repo
+
+    4.4 # Removing remote branches.
+
+        git push -d remote_repo_name branch_name
+
+        exmple :
+
+            git push -d origin develop
+
+
+5.0 # Examining commit info
+
+    **the command git log allow us the 
+    see information about the commits made in a branch 
+    ** it comes with serveral options 
+
+    example :
+
+        git log 
+
+    example 2 **short version :
+
+        git log --oneline 
+
+    example 3 **long version :
+
+        git log --oneline --pretty --all --graph
+
+
+6.0 # Creating a .gitignore 
+
+    **Creating a .gitignore file in you work directory 
+    allows to tell git which files/directory you do not want to 
+    to be added to the repository when a commit is made 
+
+    6.1 #  Create  .gitignore file 
+
+        touch .gitignore 
+
+    6.2 # Add to the .gitignore files which files or directories you
+    dont want to add the the repository 
+
+        example 
+            <.gitignore>
+            ------------
+
+            venv/
+            .pyc 
+
+        **This .gitignore files specifies to ignore 
+        all directories who match "venv" and all the files that end with 
+        ".pyc" 
+
+
+        PATTERNS :
+
+            - dir_name/  ** all direcotires that match this pattern and their content
+            - *.log      ** all files that end in .log
+            - .log       ** all files that end in .log
+            - log        ** all files and dirs that contain the "log" word
+
+
+
