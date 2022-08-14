@@ -1,44 +1,137 @@
 DOCKER USER MANUAL
 
-# Basic commands
+1.0 # INSTALLATION
+
+	**Ubuntu/linux installation** 
+	** remove old versions**
+
+	sudo apt-get remove docker docker-engine docker.io containerd runc
+
+	sudo apt-get update
+	sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+	**Add docker official GPG key **
+
+	sudo mkdir -p /etc/apt/keyrings
+ 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+	**Setup the repository**
+
+	echo \
+	"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+	$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+	**Install the docker engine**
+
+	sudo apt-get update
+ 	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+	**Add tocker to the path**
+
+	sudo groupadd docker
+	sudo usermod -aG docker $USER
+	newgrp docker 
+
+	**Check the engine is working** 
+	sudo docker run hello-world
+
+	**install docker compose**
+
+	sudo apt-get update
+ 	sudo apt-get install docker-compose-plugin
+
+	**check versions**
+
+	docker --version
+	docker compose version
+
+-----------------------------------------------------------------------------------------------
+
+2.0 # BASIC COMMANDS
 
 	
 	docker ps  **current running container
 	docker ps -a **previously run images
-	docker start **starts container
-	docker stop **stop container
+	docker ps -l **last container 
+	docker ps -s **container size 
+	docker images **see a list of the list availables
+	docker system prune **clean /delete non used/stoped containers
+	docker create <image_name> **creates a container .
+	docker start <container id/container_name> **starts container
+	docker run <image_name> **runs a docker image. Docker run executes docker create + docker start .
+	docker stop **stop container . If the container does not stop run docker kill
+	docker kill **force stop the container
 	docker restart **restart contianer
 	docker logs <container_id> ** just the cointainer logs
 	docker tag <image_name> <new_tag>/<image_name>
 	docker rmi <image_id> ** removes and image
 	docker rm <container_id> ** removes container
-	docker exec -it <container_id> ** allows to get inside the container files
+	docker pull <image_name>:<image_version> downloads a new image form dockerhub
+	docker exec -it <container_id> <command> ** allows to launch command in docker containers
+	docker exec -it <container_id> /bin/bash ** enables a console inside de container
+
 
 ----------------------------------------------------------------------------------	
 
-# Download docker image : 
 
- 	docker pull <image_name>
+3.0 # CREATE A DOCKER IMAGE
 
----------------------------------------------------------------------------------------
+** Docker files are blueprints for creating images or "recipes".
+** Docker files are just files named : Dockerfile.
+** In order to build and image you need to create a base image.
+** Usually the base image is an OS like linux / windows / mac
+** Alpine is a very light linux based docker image.
 
-# Create docker images
-
-** Docker files are blueprints for creating images or "recipes". This images created by docker files
-can be used in a docker compose just like the stadard ones.
-** Docker files are just files named : Dockerfile
-	
-
+	#Comments
+	#Description
+	#Author 
+	#Date
 	FROM <image_name>	
 	ENV <set_enviroment_variables>  
-	RUN mkdir -p /home/app  
-	COPY . /home/app   
+	RUN <commands> 
+	COPY <source> <destination>  
+	EXPOSE <port_number> 
+	ENTRYPOINT [commands]
 	CMD ["run_command_for_image" , "/home/app/entry_point_file"] 
 
-	** FROM <image_name> : Set_enviroment_variables (optional).It is advicesable to leave ENV to compose files
-	**RUN mkdir -p /home/app : Creates a directory inside the container as entry point for the app
-	**COPY . /home/app : Copies the local files of the host machine int /app inside the container
-	**CMD :Execution commands . Notice these strings require ""
+	**FROM <image_name> : Image to ve installed in your container. Checkout dockerhub for
+							image names.
+
+	**ENV <env_varialbes> : key value environment variables.
+		- example :
+					ENV MY_NAME="John Doe"
+					ENV MY_DOG=Rex\ The\ Dog
+					ENV MY_CAT=fluffy
+	
+	**RUN: runs commands inside your images like in any operative system.
+	
+	**COPY : Copy instruction copies the local files in your machine into a directory inside the container.
+		- example :
+			. /home/app  **Copies the local "." files of the host machine int /home/app inside the container
+	
+	**EXPOSE : expose a connection port to the current network.
+		- example : 
+				EXPOSE 9000
+
+	**ENTRYPOINT : Specifies the executalbe the container will use. This the language the container
+				   will use to run files inside. 
+				   The default entrypoint is  /bin/sh 
+				   However we ca specify others like  Python , Go or make 
+		-example :
+			ENTRYPOINT [python]
+			ENTRYPOINT [make]
+			ENTRYPOINT ["/bin/echo"]
+			** CMD then will use this entry points to run commands like
+			CMD [install] ---> if ENTRYPOINT ["make"] then CMD is actually running  
+			make install
+
+	**CMD :	Execution commands .This commands will you the compiler/executable 
+			defined in ENTRYPOINT . If ENTRYPOINT is no defined then 
+			it will use the default ENTRYPOINT /bin/sh . Notice these commands require ""
 
 Example : 
 
@@ -60,29 +153,64 @@ Example :
 
 ---------------------------------------------------------------------------------------------	
 	
-# Build docker file :
+4.0 # BUILD A DOCKER FILE :
 
-	docker build -t <docker_image_name:version> <path_to_docker_file>
-	
-	**<docker_image_name:version> : How would you like to name your image
-	**<path_to_docker_file> : path to the docker file . Use "." if it is in the current dir
-	
-How to retag/tag a dockerfile :
+	sintaxis:
 
+		**All docker files must be called Dockerfile
+
+			docker build <image_url_location>
+			
+			docker build .  **If the Dockerfile is the current folder
+
+			docker build -t <image_name:version> <image_url_location>  **name and tag your image
+
+	
+	How to retag/tag a dockerfile :
 	docker tag <image_name> <new_tag>/<image_name>
+
 
 ---------------------------------------------------------------------------------------------
 
-# Run docker container:
 
+5.0 # RUN A DOCKER IMAGE:
 
-	 docker run -d -p<host_port>:<container_port> --name <custom_name> --net <network_name> image_name
+	sintaxis:
+
+		docker run <parameters> image_name:tag
+
+		example:
+
+			docker run image_name ls 
+			**will display the directories inside the image.
+
+	<PARAMATERS>
+		
+		-d  **run in detach mode 
+		-p <machine_port>:<container_port> **binding of the host machine port and container port 
+		--name <custom_name> **adds a custom name to the container 
+		--network <network_name> **Adds a custom network to the container.
+									**if used --network host then the host machine network is used.  
+		--dns **Sets a custom dns to the container
+		--ip  **Sets an ipv4 to the container
+		--restart **Define a restart poilicy.
+			--restart=no 
+			--restart=always 
+			--restart=on-failure:number_of_max_tries
+			--restart=unless-stopped
+		--memory <number><unit> **Define the memory the container can use. By defaul it uses all 
+								the memory of the host machine.
+								--memory=<number><unit> **units can be b,k,m,g.Minimun is 4m
+		--entrypoint **Specifies the images entry point (Check poinrt 3.0 CREATE A DOCKER IMAGE)
+						--entrypoint /bin/bash python  **2 entrypoint defined
+		-e **Set environment variables 
+					-e "host=localhost" "port=300"  ...
+
+	example :
+		docker run -d -p<host_port>:<container_port> --name <custom_name> --net <network_name> image_name
 	 
-	 ***** Notice not all this parameters are necessary for a simple build
-	 **-p : binding of the host machine port and the container internal port.
-	 **-d : run in detach mode.
-	 ** --name : renames the container with the specified name
-	 **--net : selects to run this container in a specific network.
+
+	 
 
 ---------------------------------------------------------------------------------------------
 

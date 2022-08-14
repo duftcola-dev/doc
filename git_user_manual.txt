@@ -212,6 +212,9 @@
             git remote rm origin
 
             git remote add origin another_url
+            
+            **Set by default at which remote branch origin is pointing at
+            git push --set-upstream origin master
 
         **The command remote add __labe__ adds a remote repository under a 
         label  ususally with the name origin although any name can be used.
