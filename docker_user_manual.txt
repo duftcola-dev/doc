@@ -72,6 +72,8 @@ DOCKER USER MANUAL
 	docker tag <image_name> <new_tag>/<image_name>
 	docker rmi <image_id> ** removes and image
 	docker rm <container_id> ** removes container
+	docker volume ls **show the volumes that currently exists in docker.
+	docker container inpect <container_name> **Show detailed informaton about a container.
 	docker pull <image_name>:<image_version> downloads a new image form dockerhub
 	docker exec -it <container_id> <command> ** allows to launch command in docker containers
 	docker exec -it <container_id> /bin/bash ** enables a console inside de container
@@ -138,6 +140,8 @@ DOCKER USER MANUAL
 	Example : 
 
 		FROM python:3.9.9-bullseye
+
+		ENV MY_PASSWORD="jon_doe"
 
 		WORKDIR /.
 
@@ -209,6 +213,9 @@ DOCKER USER MANUAL
 						--entrypoint /bin/bash python  **2 entrypoint defined
 		-e **Set environment variables 
 					-e "host=localhost" "port=300"  ...
+		-v <path_to_volume_folder>:<path_to_volume> **Creates a volume for the mounted image.
+				-v /home/mysql/data:/var/lib/mysql **It is recomended to use an apsolute path
+												   
 
 	example :
 		docker run -d -p<host_port>:<container_port> --name <custom_name> --net <network_name> image_name
@@ -244,7 +251,79 @@ DOCKER USER MANUAL
 
 6.0 # DOCKER VOLUMES 
 
+	** Volumes are storage systems in docker images .
+	** Volumnes allow data persistency in docker images.
 
+	** Volumes types :
+
+		- Mounted volumes (bind mounts)  : A directory of the machines is copied into a contianer.
+											- have a high performance.
+											- the use the resources and structure of the host machine.
+										
+		- Named volumes (data volume) : A new directory is created within docker's inner memory storage.
+											- easier to backup.
+											- work both in linux and windows systems.
+											- can be safely share among containers.
+											- can be incrypted
+
+		- Anonymous volumes : Are any volumne created automatically by the image when no mounted volumes	
+							  are specified.
+
+	** MOUNTED VOLUMES (BIND MOUNTS)
+
+		** use the -v </files_path>:<volumne_path> to specify the location of the volume.
+		** each database mounts its volume in a different way. Check dockerhub to see 
+		   how each database mounts its volumes .
+		** in the case of mysql is :/var/lib/mysql
+
+		*** If the files arleady exists and you perform a volume creation 
+		then all the files that exists in the target folder are coppied into the volume :
+		
+		example :
+			-v </myapp/file>:</docker/volume/data>
+
+		example:
+
+		**This is an image without a volume.Thefore an Anonymous/Orphan volume is create. 
+
+		docker run -d --name mysql -e "MYSQL_ROOT_PASSWORD=root" mysql:latest
+
+		example :	
+		**This is an image with a mounted volume .
+		**If there are no files in /home/ubuntu/mysql/ the mysql image creates them. 
+		** If there are files in /home/ubuntu/mysql/ the files are just copied into /var/lib/mysql.
+
+		docker run -d -v /home/ubuntu/mysql/data:/var/lib/mysql  --name mysql -e "MYSQL_ROOT_PASSWORD=root" mysql:latest
+
+
+	** NAMED VOLUMES (DATA VOLUMES)
+
+		** Name volumes do not need to be addressed to a folder like mounted volumes.
+		** Named volumes are managed by docker itsef and do not exists within your local machine.
+		** use :  docker volume ls **Show all the volumes that currently exists in docker.
+
+		sintaxis :
+			-v volume_name:volume_path
+
+		example :
+		
+		docker run -d -v mysql_volume:/var/lib/mysql  --name mysql -e "MYSQL_ROOT_PASSWORD=root" mysql:latest
+
+		**notice this volume path : /var/lib/mysql is exclusive of mysql database images.
+
+	
+	** Data volumes that are not being used appear as orphan volumes .
+	** An orphan olume can be eliminated as :
+
+		- docker volume ls 
+		- docker volume rm <volume_id> 
+		
+			or 
+		- docker volumen rm <volume_name> 
+
+	** Eliminate all orphan volumes (including Name volumes)
+
+		docker volume rm $(docker volume ls -f=dangling=True -q)
 
 ---------------------------------------------------------------------------------------------
 
