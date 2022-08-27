@@ -1,5 +1,6 @@
 ## Documentation repository
 # Mysql
+# Nodejs
 # FastApi
 # Docker
 # Git/GitFlow
@@ -7,3 +8,5 @@
 # Python
 # Sqlite3
 # Redis
+# Go
+# AWS

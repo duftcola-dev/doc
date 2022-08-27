@@ -1,0 +1,236 @@
+# GIT HUB CICD 
+
+1.0 # INTRODUCTION
+
+    **The first obvious step is to create a repository.
+    **Then in your repository go to --> actions
+    **Select a work flow templates.
+
+    **There are 4 workflow categories.
+        - DEPLOYMENT 
+        - AUTOMATION 
+        - CI/CD
+        - SECURITY
+
+    **Like in cirlce ci a workflow can be create in your projet by adding 
+    a file .github/workflows/actions.yml that specifies all the actions done by the pipeline 
+    **Notice you can add multiple workflow files 
+    each one reperesenting a workflow.
+
+    example : 
+
+            .github/workflows/test.yml 
+                              build.yml
+                              deploy.yml
+
+---------------------------------------------------------------------------------------------------
+
+2.0 # CREATE A WORKFLOW 
+
+    sintaxis :
+
+        > trigger events : This event  can be actions like performaed by git :
+                            - push 
+                            - pull
+                            - schedule
+                            - pull_request 
+
+        > runner : executor/runner of the tests like : ubuntu-latest ,docker
+
+        > if : The operations below the if statement are only executed if
+                the current repository is the specified in the condition
+
+    ------------------------------------------------------------------------
+
+    example 1:
+
+        name: **workflow_name 
+
+        on:  **trigger event
+        
+            branches: ["main"]  **branches afected by the trigger
+
+        jobs: **opeing of the tasks to be done 
+
+            tests : **job tag/label
+                if : github.repository == 'duftcola/develop'
+                runs-on: **runner
+                steps:
+                    - name: Checkout
+                      uses: actions/checkout@v3 **basic code checks **Use always yout testd use the repository code
+                    - name: Setting language 
+                      uses: actions/setup-python@v4
+                      with : 
+                        python-version: 3.8.10
+                    - name: Installing node
+                      run: node tests.js
+
+        ** notice the tag -name sparates the different steps 
+        ** notice the tag "uses" is meant to install deppendencies while the tag "run" 
+            runs actual commands against you code.
+        ** Do no use uses and run at the same time after -name :
+
+            example : (DONT do this)
+            
+            - name : Somthing 
+              uses : some library 
+              run : some command
+            
+        ---> instead do this :
+
+            - name : installing libraries 
+              uses : some library 
+            - name : running commands 
+              run : some command
+             
+
+    example 2:
+
+        name: Testing app_template module 
+
+        on:
+            push:
+                branches: ["develop"]
+        jobs:
+            testing:
+                runs-on: ubuntu-latest
+                steps:
+                - name: Building docker image 
+                  uses: actions/checkout@v3
+                - name: Building image
+                  run: docker build -t duftcola/app_template .
+                - name : Running image
+                  run: docker run -d -p 3000:3000 --name app_template_container app_template 
+                - name : Executing test
+                  run: docker exec app_template_container pytest tests/
+
+        
+        ** Only when it comes to github do not use the -it option with docker exec 
+            due that it causes a TTY error.
+
+
+    example 3: (using a matrix to allow many versions)
+
+    name : Some task 
+    on : push 
+        branches : ["main","develop"]
+    jobs:
+        python_versions:
+            strategy:
+                matrix:
+                    version:[3.6,3.9,3.10]
+            steps:
+                - uses: actions/setup-python@v4
+                  with:
+                    python-version: ${{matrix.version}}
+
+
+---------------------------------------------------------------------------------
+
+
+3.0 # ENVIRONMENT VARIABLES 
+
+    **There are 3 type of environment variables we can set with github
+    actions : 
+
+        - public environment variable set with env:
+          example : 
+
+            env:
+                API_NAME: Some name
+            
+            jobs:
+                job1:
+                    runs-on: ubuntu-latest 
+                    steps:
+                        - name: Setting variable
+                          run : echo "The env variable says ${{env.API_NAME}}"
+
+
+        
+        - secret variables using the settings and defining the varaibles in secrets
+
+            **In a github repository --> settings ---> secrets --> new secret
+            **We can access the secret variables by using  ${{secrets.VARIABLE1_NAME}}
+
+
+        - environments with secret variables using settings and defining and environment
+            ** In a github repository --> settings ---> environments --> new environment
+            ** Now we can define secrets that belong only to an specific environment 
+            ** This secret variables are also referenced using the secre. word :
+                ${{secrets.VARIABLE_FROM_ENVIRONMENT}}
+    
+
+    example : 
+        ** we define an environment name "test"
+        **we define the variable APP_NAME="robin"
+
+        name: Deployment
+
+        on:
+        push:
+            branches:
+            - main
+        env:
+            API_NAME: blablacar
+
+        jobs:
+        testing_app:
+            runs-on: ubuntu-latest
+            environment: test
+            steps:
+            - name: deploy
+              run : echo "The env variable says ${{env.API_NAME}}"  **locally defined env varaible 
+              run : echo "The env variable says ${{secrets.API_KEY}}" ** variable from secrets 
+              run : echo "The env variable says ${{env.API_PASS}}" **variable fro secrets in environment test
+
+
+---------------------------------------------------------------------------------------------------
+
+
+4.0 CREATING .env files for deployment
+
+    The simplest way is though commands create the 
+    specified .env file in the desired directory and 
+    add the secrets one by with ${{secrets.something}}
+
+    There are github actions in the github actions market place to 
+    make this task easier: 
+
+    https://github.com/marketplace/actions/create-env-file 
+
+    example :
+
+        name: Create envfile
+
+on: [ push ]
+
+jobs:
+
+  create-envfile:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_DEBUG: false
+        envkey_SOME_API_KEY: "123456abcdef"
+        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        some_other_variable: foobar
+        directory: <directory_name>
+        file_name: .env
+        fail_on_empty: false
+
+    
+    **notice envkey is a tag en the real value stored in the file will
+    be  DEBUG or SOME_API_KEY
+
+
+---------------------------------------------------------------------------------
+
+
+5.0 DEPLOYMENT
+
+    <work in process>

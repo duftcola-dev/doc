@@ -1,0 +1,130 @@
+1.0 # CI/CD CircleCi 
+    
+    - Every CircleCI project requires a configuration file called .circleci/config.yml in your project folder 
+    - Once the configuration file is defined it is possible to create workflows
+    - Create a github repo with your project and the .circleci/config.yml file 
+    - Create and link a cirleci account to your github a account 
+    - In Projects ---> Set a project 
+    - Define workflows / pipes for your project
+
+    Then you can create a pipeline in the following ways :
+
+        FASTEST : Using an existing  .circleci/config.yml file 
+        FAST : Creating a .circleci/config.yml file 
+
+
+
+2.0 # CREATING A config.yml TEMPLATE (python)
+
+PARTS OF THE CONFIG TEMPLATE :
+
+    VERSION
+
+        **used to express breaking changes
+        version: 2.1   
+
+
+    JOBS 
+
+        **example with docker: 
+
+        jobs:                                **tasks and tests
+           build:                            **name of the job
+            docker:                          ** executor type
+             - image: cimg/base_image:latest **image type
+
+             steps:
+                **commands to run
+        
+
+        **example with ubuntu:
+        ** ubunut machines size :
+            medium	2	7.5 GB	100GB
+            large	4	15 GB	100GB
+            xlarge	8	32 GB	100GB
+            2xlarge	16	64 GB	100GB
+
+
+        jobs:
+            build:
+                machine:
+                    image: ubuntu-2004:current  **ubuntu images include docker / docker-compose
+                resource_class: medium
+                    steps:
+                        - run: "run some command"
+
+        example :
+
+            version: 2.1   
+            
+            jobs:
+                build_job:
+                    machine:
+                        image: ubuntu-2004:current  
+                    resource_class: medium
+                    
+                    steps:
+                        - run: "run some command"
+                        - run: "run some command"
+                        - run: "run some command"
+                        - run:
+                            name: 'Commencing CI/CD
+                            command: echo 'do something'
+                test_job:
+                    machine:
+                        image: ubuntu-2004:current  
+                    resource_class: medium
+                    
+                    steps:
+                        - run: "run some command"
+                        - run: "run some command"
+                        - run: "run some command"
+
+
+3.0 # ENVIRONMENT VARIABLES 
+
+    **With cirlceci we can declare ENVIRONMENT VARIABLES in the 3
+    different ways : 
+
+        - inside a command 
+        - using the word environment inside a job 
+        - using the project environment variable (encrypted)
+
+
+    # INSIDE A COMMAND 
+
+        -run:
+            name: "Building environment"
+            command: |
+                IMAGE: "ubuntu:latest"
+                echo docker build -t $IMAGE .
+
+
+    # USING THE ENVIRONMENT KEY WORK 
+
+        jobs:
+         build-job_
+            docker:
+                - image: cimg/base:2020.01
+            environment:
+                IMAGE_NAME: some_name
+           
+
+    # PROJECT LEVEL ENVIRONMENT VARIABLES
+
+        **Set a projec --> settings -->environment --> define secret variables 
+        **This variables are not global and can used just by using the $ tag :
+
+            $DOCKERHUB_PASSWORD
+
+        example :
+            jobs:
+                build:
+                    docker:
+                    - image: cimg/base:2021.11
+                        auth:
+                        username: mydockerhub-user
+                        password: $DOCKERHUB_PASSWORD  ** context / project UI env-var reference
+
+
+4.0 # DEPLOYING

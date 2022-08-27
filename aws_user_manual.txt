@@ -1,0 +1,25 @@
+# AWS USER MANUAL 
+
+# types of cloud infrastructure 
+
+    - ON-Premise : the client (you) own the software and all the infrastructure 
+    - IASS : (Infrastructure as a service)
+            The client owns the code and the logic but AWS provudes the 
+            infrastructure
+    - PASS : Platform as a service . The client owns the software and the cloud 
+            and provides a service the client uses. Usually a a database to 
+            which you can me requests
+    - SASS : Software as a service. The client only has access to an application or
+            software like for instance gmail.
+
+# TERMS 
+
+    Regions : Is ohisical location around the world where a data cluster center is located.
+    Availavility zone (AZ) : One or more datacenters in a region. AZ are connected in a region
+                             with data redundancy and low latency. Az are capable of edge computing
+                             replicating the services across eachother. Az are less than 100Km appart
+                             from eachother.
+    Local zones : Areas closer to the enduser that provide aws services.Each local zone is an extesion
+                  of a region where you can run low tancy services.
+
+    

@@ -280,7 +280,7 @@ DOCKER USER MANUAL
 		then all the files that exists in the target folder are coppied into the volume :
 		
 		example :
-			-v </myapp/file>:</docker/volume/data>
+			-v <local_files_path>:<volume_path>
 
 		example:
 
@@ -323,70 +323,181 @@ DOCKER USER MANUAL
 
 	** Eliminate all orphan volumes (including Name volumes)
 
-		docker volume rm $(docker volume ls -f=dangling=True -q)
+		docker volume rm $(docker volume ls -f=dangling=true -q)
 
 ---------------------------------------------------------------------------------------------
 
-# Creating docker compose using docker yaml
+7.0 # NETWORKS 
+
+	**show default docker networks
+	
+	docker networks ls 
+
+	**by default docker has the following networks with the following drivers
+
+		**network_name:driver_name
+
+		- bridge:bridge** Every contianer created is added to the bridge network
+		- host:host   ** Host machine network . Connecting an image to this network grant access to internet
+		- none:null
+
+	**Networks with the bridge driver can connect with eachother.Bridge is a also eht driver by default.
+	
+	**Create your own network :
+
+		docker network create --driver bridge my_bridge_network
+
+		**use -->  docker netwok inspect <network_name>  in order to see the details of the network.
+
+	**Add a container to the created network 
+
+		docker run -d --name container_x --network my_bridge_network image_name
+
+	**Connect a standalone container with a network to different network.
+
+		docker network connect <network_name> <container_name>
+
+---------------------------------------------------------------------------------------------
+
+8.0 # DOCKER COMPOSE (For development)
 
 ** Docker compose is just a file to contain docker commands
-**When Creating a Docker compose file no it is no necessary to create a network since the docker compose file does
-it for you.
-Example of a .yaml file for Postgresql:
+** Docker compose automatically looks for .env files in the current directory when created 
+** You can add the values of your .env file the docker-compose file using ${variable_name}
+** You can also pass a .env file as argument --> docker-compose --env-file ./config/.env.dev up
+** Use the -f flag to call docker compose from a different file --> docker compose -f /file_path/docker-compose.yaml up 
+** Environment variables can also be set using the tag :
+
+	environment:
+		- VARIABLE1=1
+		- VARIABLE1=2
+		- VARIABLE1=3
+	
+	**Though this option is only recomended for testing/development since it exposes the variables
 
 
-version: '3.1'
+** Build you docker compose file with docker-compose up -d
+** Stop you docker compose files with docker-compose down
+** Use the tag -f to specify a path to the docker compose file : docker-compose -f <path/dev.yaml> up
 
-services:
+sintaxis:
 
-  db:
-    image: postgres
-    user : root
-    restart: always
-    ports:
-    	- 8080:8080
-    environment:
-      POSTGRES_PASSWORD: some_passwords_service
-     
-    networks:
-        - network_name_for_thi
-    volumes:
-        - ./some_folder:/data/some_subfoolder
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+	version: '<version>'
+
+	services:
+		service_name:
+			container_name: <container_name>
+			image: <image_name>  **not compatible with build
+			build:  **not compatible when suing the tag image
+				context: <docker_file_path> ** use  . if in the saem folder
+				dockerfile: <path_to_docker_file>  ** In case we want to build an image from our own Dockerfile
+			user: <user_tag> **use root for full access
+			volumes:
+				- <host_machine_path>:<container_file_path>  **for mounted volumes only
+				- data_volume_name:<container_file_path> 	**for data volumes only
+
+			networks:
+				- <network_name>
+				- <network_name>
+				- ${networ_name} **from a .env file
+				- ports:
+					- <host_machine_port>:<container_port>
+					- <host_machine_port>:<container_port>
+			restart: <restart_option> **always , on-failure , no, unless-stopped
+			command : ["commands", "this", "particular images  requires"]
+
+	networks:
+		network_name:
+			name: network_custom_name
+			driver: driver_name      ** driver types : bridge , host ,local
+			external: true **If the network already exists or was previously created set this option
+	
+	volumnes: **for data volumes_only
+		data_volume_name:
+			name: volume_id
+
+	------------------------------
+	example of using .env files  :
+	------------------------------
+
+	$ cat .env 
+
+	TAG=v1.5 
+
+	$ cat docker-compose.yml 
+
+	version: '3'
+	services :
+		web :
+			image: "webapp:${TAG}"	
+
+
+	----------------------------------------------
+	example of docker compose file for development	
+	----------------------------------------------
+		version: '3.1'
+
+		services:
+
+		db:
+			image: postgres
+			user : root
+			restart: always
+			ports:
+				- 8080:8080
+			environment:
+			POSTGRES_PASSWORD: some_passwords_service
+			
+			networks:
+				- network_name_for_thi
+			volumes:
+				- ./some_folder:/data/some_subfoolder
+		adminer:
+			image: adminer
+			restart: always
+			ports:
+			- 8080:8080
 
 **the tag user: root **gives you full access to your volumes,this is important to sae your volumes in git
 
 Using the docker compose command : 
 
-	docker-compose -f <file_in_app_folder.yaml> up ** This starts adn creates the containers in the compose file
+	docker-compose -f <file_in_app_folder.yaml> up ** This starts and creates the containers in the compose file
 	docker-compose -f <file_in_app_folder.yaml> down ** Stops all containers in the compose file
+
+
+--------------------------------------------------------------------------------------------------------------
+
+9.0 # DOCKER COMPOSE (Production)
+
+	**Docker compose files when used in production need to follow certain specifications.
+
+		- No bind (monted volumes). All volumes need to be data volumes so noone can modify
+		  the files bond to the container.
+		- Binding to the ports of the host. If it is an EC2 machine then the machine host is 80
+		- Restart policy set to "always"
+		- Consider then defining a production file called docker-compose.production.yml with its own configuration file.
+		- Production files will override the values in the docker-compose files to set to prodution.
+		- You can use this technich for creating development and testing compose files 
+
+		example :
+
+			docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
+
+			**Here the "production file is overriding the values of the compose file in order 
+			to pass it a prodution configuration .
+
+		example : **This can be don fo testing and development files as well
+
+			docker compose -f docker-compose.yml -f docker-compose.development.yml up -d
+
+			docker compose -f docker-compose.yml -f docker-compose.test.yml up -d
+
 
 -------------------------------------------------------------------------------------------
 
-# Data persistance with Docker volumes. 
 
-** The main use of docker volumes is to have data persistance . That means all the infor in your container/s is copied into a local folder so it can be save every time the container/s are stoped and restarted.
-So basically the path to a file/folder in our host machine is added to the container fro persintency .
-
-There are 2 types of docker volumes :
-
-	1) Host volume : the reference
-	*During docker run command add the option -v <path_to_host_folder>:<path_to_container_folder> where data 		will stored . ** <path_to_host_folder>:<path_to_container_folder> should be the same.
-	
-	2) Volume defined in docker-compose
-	volumes:
-	    - <folder_name_for_volume>:/sub_folder
-
-		or
-
-		- .:/sub_folder  **in case you want to create the volumen in the current location
---------------------------------------------------------------------------------------------
-
-# Create a .dockerignore file
+ 10.0 # CREATE A .dockerignore
 
 	A .dockerignore file is a file that allow us to spedify rules on wich files 
 	should be copied and build during the image building process thus they wont be
@@ -414,5 +525,28 @@ There are 2 types of docker volumes :
 -------------------------------------------------------------------------------------------
 
 
-	
-	
+11.0 CI/CD 
+
+	**CI/CI aka continous integration / continous development is the techinique that allow us to continue
+	adding features and testing our application.
+
+		(develop_branch)	(develop_branch) (main branch)        (cloud)
+		local_development ----> github -------> github---------> deployment
+							(CI/CD develop)
+								- test 
+								- build 
+								- deploy
+
+		- new features are tested / added in development branches
+		- when tests pass new features are merged to the branch main 
+		- when new features are validated in the main branch then they are deployed to production server like 
+			- EC2 (AWS)
+			- Elastic beanstalk (AWS)
+			- other clouds etc
+
+	** With some images is necessary to use the option -e CI=True 
+	when using your contianer for testing in order to exit after the test.
+
+	example :
+
+		docker run -e CI=true ...
