@@ -1,3 +1,21 @@
+INDEX
+
+0.0 # TYPES OF INFRASTRUCTURE
+0.1 # TERMS GLOSSARY 
+1.0 # BILLING 
+        1.1 # CALCULATING BILLING
+        1.2 # CREATE EXPENDING ALARMS 
+2.0 # INFRASTRUCTURE HEALTH 
+        2.1 # PERSONAL HEALTH DASHBOARD
+        2.3 # TRUSTED ADVISOR
+3.0 # VPC NETWORKING
+        3.1 # INTRODUCTION TO VPC 
+        3.2 # CREATE A VPC
+        3.3 # ROUTES TABLES 
+4.0 # ACL (Access control list )
+5.0 # CREATE A SUBNETWORK
+
+
 
 --------------------------------------------------------------------------------------
 
@@ -106,7 +124,7 @@ AWS USER MANUAL
                   the current state of you infrastructure like .
                 - Envent log displays any issue or action that has taken place recently.
         
-        2.3 #  TRUSTED ADVISOR
+        2.3 # TRUSTED ADVISOR
 
                 - Displays recomendations about your current infrstructure .
                 - It has a free tier.
@@ -140,7 +158,7 @@ AWS USER MANUAL
                 -This subnetworks can public or private.
                 -Having private and public subnetworks makes sence for production and development services.
 
-        3.2 #  CREATE A VPC
+        3.2 # CREATE A VPC
         
                 Services-->Networking and content delivery --> VPC --> VPC dashboard
 

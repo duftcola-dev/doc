@@ -1,17 +1,27 @@
+from calendar import c
+from typing import Tuple,List
 
 def get_path()->str:
     print("Relative path to file : ")
     path = input()
     return path
 
-def get_file_data(path:str)->tuple(str,list[str]):
+
+def get_file_lines(path:str)->List[str]:
     file = open(path,"r")
-    copy_content=file.read()
     lines = file.readlines()
     file.close()
-    return copy_content,lines
+    return lines
 
-def create_index(lines:list[str])->list[str]:
+
+def get_file_copy(path:str)->str:
+    file = open(path,"r")
+    copy_content=file.read()
+    file.close()
+    return copy_content
+
+
+def create_index(lines:List[str])->List[str]:
     index=[]
     new_content=[]
     for line in lines:
@@ -25,8 +35,8 @@ def create_index(lines:list[str])->list[str]:
     new_content+=lines
     return new_content
     
-def reformat_file_with_index(path:str,new_content:list):
 
+def reformat_file_with_index(path:str,new_content:list):
     file = open(path,"w")
     file.write("")
     file.close()
@@ -43,9 +53,9 @@ def create_copy(path:str,content:str):
 
 
 def main():
-
     path=get_path()
-    copy_content,lines=get_file_data(path)
+    copy_content=get_file_copy(path)
+    lines=get_file_lines(path)
     create_copy(path,copy_content)
     new_content=create_index(lines)
     reformat_file_with_index(path,new_content)
