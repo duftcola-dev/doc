@@ -1,6 +1,11 @@
-# AWS USER MANUAL 
 
-# types of cloud infrastructure 
+--------------------------------------------------------------------------------------
+
+AWS USER MANUAL
+
+----------------------------------------------------------------------------------------
+
+0.0 # TYPES OF INFRASTRUCTURE
 
     - ON-Premise : the client (you) own the software and all the infrastructure 
     - IASS : (Infrastructure as a service)
@@ -12,7 +17,7 @@
     - SASS : Software as a service. The client only has access to an application or
             software like for instance gmail.
 
-# TERMS 
+0.1 # TERMS GLOSSARY 
 
     Regions : Is ohisical location around the world where a data cluster center is located.
     Availavility zone (AZ) : One or more datacenters in a region. AZ are connected in a region
@@ -22,4 +27,199 @@
     Local zones : Areas closer to the enduser that provide aws services.Each local zone is an extesion
                   of a region where you can run low tancy services.
 
-    
+
+-------------------------------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------------------
+
+1.0 # BILLING 
+
+        Before start any aplication/service the most importan thing to do
+        is to define and calculate the cost of the servers and aplication 
+        we are about to launch:
+
+        1.1 # CALCULATING BILLING
+
+        **in search bar 
+
+                --> Billing
+                        ---> Bills: Displays information  about the current expending 
+
+
+        1.2 # CREATE EXPENDING ALARMS 
+
+                **Currently alarm bills can only be done in the
+                EE.UU EAST NOTH VIRGINIA region 
+                so make sure you just this region before making the bill.
+
+
+                ---> Billing 
+                        ---->Billing preferences 
+                                
+                                - Recieve Free Tier Usage Alert  **select both services
+                                - Receive Billing alerts         **select this option too
+
+                                - Manage Billing Alerts 
+                                        
+                                        ----> Cloud watch
+                                                ---> Alarms 
+                                                        ----> All Alarms
+                                                                --> Create alarm
+                
+                ** then you have to select a metric 
+                        - Billing  <--- Select billing
+                        - Logs 
+                        - Usage 
+                                
+                        **Select billing 
+                                ---> total estimated charge 
+                                        --> Estimated charges <-**select this
+
+                **Then select the metric and now you can set the conditions that trigger the alarm
+
+                ** Select the static value 
+                ** Select treshold greater
+                ** Select create new topic to create new messages 
+                ** Select email where the alarms will be sent 
+
+                ---> next 
+
+                ** Set alarm name
+                ** Set alarm description
+                --> Create alarm 
+
+                **Finally you have to confirm the subcription of the alarm in your email.
+
+                
+
+------------------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+2.0 # INFRASTRUCTURE HEALTH 
+
+        2.1 # PERSONAL HEALTH DASHBOARD
+
+                - Is a widjet in the home page of your aws console that desplays information about 
+                  the current state of you infrastructure like .
+                - Envent log displays any issue or action that has taken place recently.
+        
+        2.3 #  TRUSTED ADVISOR
+
+                - Displays recomendations about your current infrstructure .
+                - It has a free tier.
+                - More advanced opitons require a pay tier.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+3.0 # VPC NETWORKING
+                
+
+        All concept in AWS are related with the Region.
+
+        3.1 # INTRODUCTION TO VPC 
+
+                Virtual private cloud is a network exclusively dedicated to a user. 
+                All our machines and infrastructer will be hosted in our VPC.
+                Creating a VPC is the first step for developing our infrastructure.
+
+                Each VPC has an IP called CIDR block that looks like this :
+
+                        10.0.0.0/16
+
+                -This is a private network 
+                -This VPC exists within a region.
+                -The CIDR block is the group of ips for our services.
+                -Inside each region there are several AZ 
+                -Inside this AZ we create subnetworks. This subnetworks host our services
+                -This subnetworks can public or private.
+                -Having private and public subnetworks makes sence for production and development services.
+
+        3.2 #  CREATE A VPC
+        
+                Services-->Networking and content delivery --> VPC --> VPC dashboard
+
+                or just search in the console search bar --> VPC --> VPC dashboard  
+
+                --> VPC --> Create VPC 
+
+                        example : default options are already fine.
+
+                                vpc-duftcola
+
+                                10.0.0.0/24
+
+                                **create additional labels (its quite important)
+
+                **By default there is alreay a VPC that belongs to the current region.
+
+        3.3 # ROUTES TABLES 
+
+                A routes table is component that allow us to define 
+                the input and output trafic in our network/VPC.
+                By default our VPC points to target = local
+                Target is the way it is possible to access to our VPC.
+
+                This means the intire CIDR block points to local.
+                This means any ip in the CIDR can access any other ip the CIDR block.
+
+                When you create a VPC a route table is create by default.
+                You can see this in your VPC --> main route table 
+
+                Right now our route table is on associated to a subnetwork.
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+4.0 # ACL (Access control list )
+
+        Allows you to define the inbound and outbound rules.
+        The main goal of the ACL is to protect our VPC.
+
+        VPC----> Your VPC ---> Main network ACL
+
+        or 
+
+        VCP ----> Security 
+                        -----> Network ACL 
+
+        example : 
+
+                select inbound rules 
+                        ---> edit inbound rules 
+
+                - rule number : priority of the rule .The higher the number the higher the priority 
+                - type : type of traffic / connection 
+                - protocol : type of protocol --> tcp ip ,http etc..
+                - port range : ports allowed 
+                - source: custom defined input IP address to access our infrastructure
+                - allow/deny : allow or deny access
+        
+        example 
+
+        Rule numberInfo  TypeInfo   ProtocolInfo  Port rangeInfo  SourceInfo  Allow/DenyInfo
+         
+            101            HTTP(80)     TCP(6)        80            0.0.0.1/24    allow 
+
+        **This rule allow access to the ip 0.0.0.1/24 throug the port 80 using http protocol.
+
+
+5.0 # CREATE A SUBNETWORK
+
+        - In order to work with VPC we must crear a subnetwork.
+        - The subnetwork is create within in a VPC 
+        - A VPC is create within in AZ
+
+        VPC --> subnetwork 
+                        --> create subnet 
+                              
+                
+                - Select a VPC 
+                - Set subnet name
