@@ -187,7 +187,17 @@
 
 3.0 # SQL DCL 
 
-    3.1 # Add foreign keys 
+    3.1 # Add primary key
+
+    sintaxis:
+        op.create_primary_key(
+            "primary_key_constraint",
+            "target_table",
+            ["columns"]
+        )
+
+
+    3.2 # Add foreign keys 
 
     sintaxis:
         op.create_foreign_key(
@@ -195,9 +205,257 @@
             "origin_table",
             "reference_table",
             "origin_column",
-            "reference_column")
+            "reference_column"
+        )
+
+    3.3 # add indexes 
+    
+    sintaxis:
+        op.create_index(
+            "index_name",
+            "target_table",
+            ["columns"]
+        )
+
+    
+    3.4 # create procedures / triggers / cursors  
+
+        **The best way alembic has to create procedures / triggers / cursors is by using implicit 
+        sql test execution : 
+
+            example :
+                op.execute("INSERT INTO table (foo) VALUES ('some value')")
+            
+            example : 
+
+                text = """
+                    CREATE PROCEDURE insert_employee_data(in e_name varchar(20),in e_email varchar(50),in e_telephone varchar(20))
+                    BEGIN
+                        declare result integer;
+                        
+                        SELECT count(employee_name) into result from employee 
+                        where employee_name = e_name;
+                        
+                        if result is null  OR result = 0 then 
+                            INSERT INTO test2.employee(employee_name,email,telephone) VALUES (e_name,e_email,e_telephone);
+                        end if;
+                        
+                        
+                    END 
+                """
+
+                op.execute(text)
+
+4.0 # SQL QUERIES EXECUTION METHODS 
 
 
+    4.1 # sqlalchemy engine 
 
+        **Is the lowest level instance of sqlalquemy and can run directly sql code.
+        **The engine object creates a connection object and does the execution too.
+
+        sintaxis :
+
+            from sqlalchemy import create_engine
+            engine = create_engine('mysql://user:tiger@password:port/mydatabase')
+            with engine.connect() as connection:
+                result=connection.execute("mysql code")
+
+            **engine.connect accepts some connection options :
+                engine.connect()
+        
+        example:
+
+            from sqlalchemy import create_engine
+            engine = create_engine('postgresql://scott:tiger@localhost:5432/mydatabase')
+            engine.connect() as connection:
+                result=connection.execute(text('SELECT * FROM tablename'))
+
+        example:
+
+            **using transactions object
+            
+                with engine.connect() as connection:
+                 with connection.begin():
+                    result = connection.execute(text("somet sql code"))
+
+
+    4.2 # sqlalchemy connection object
+
+        **the connection object is the result of the previous engine object and
+        works as come sort of cursor. Use the connection object explicitely when
+        you wish to have more control over transacionts
+
+        example:
+
+            1) create engine 
+            2) create connection
+            3) start transaciont 
+
+            engine=create_engine('postgresql://scott:tiger@localhost:5432/mydatabase') 
+            connection=engine.connect()
+            trans=connection.begin()
+
+            try:
+                trans.execute("some sql query")
+                trans.commit()
+            except:
+                trans.rollback()
+                raise 
+    
+
+    4.3 # The session object
+
+            **A session is an object that represent are interactions
+            and conversations with the database. It provides and interface
+            for queries that will return data and modify the objects of the ORM .
+
+            example:
+
+                from sqlalchemy import create_engine
+                from sqlalchemy.orm import Session
+
+                engine = create_engine('postgresql://scott:tiger@localhost/')
+                
+                with Session(engine) as session:
+                    session.add(some_object)
+                    session.add(some_other_object)
+                    session.commit()
+
+                **The sessiont is atuatically closed at the end of the block
+
+
+            example:
+
+                **sessions can also use transactions 
+                
+                with Session(engine) as session:
+                    session.begin()
+                    try:
+                        session.add(some_object)
+                        session.add(some_other_object)
+                    except:
+                        session.rollback()
+                        raise
+                    else:
+                        session.commit()
+
+
+            **Generate queries , its main function 
+            **Sessions have the query object that indeed generates queires based
+            on object relations . 
+            **Sesions implicitely make use of the engine.
+            **The result of the query object is a text(query) object or string representing
+            a sql query
+
+            sintaxis : 
+
+                new_query = session.query(class_name).filter_by(column_name=condition).all()
+            
+            example: select columns 
+
+                new_query = session.query(User.id,User.name)
+
+
+            example :  basic select 
+
+                new_query = session.query(User).filter_by(id=1).all()
+
+            example : join 
+
+                new_query = session.query(Employee,Manager).join("employee_id").filter_by(name="Robin").all()
+
+
+            example : pagination 
+
+                new_query = session.query(User).limit(n_rows).offset(row_index)
+
+
+            example : execute the resultant query
+
+                session.execute(new_query).all()
+                
+
+
+5.0 # SQLALCHEMY DECLARING MODELS
+
+    5.1 # REQUIREMENTS 
+
+        **In order to create models used by the session object you need :
+
+        from sqlalchemy import Column        
+        from sqlalchemy import ForeignKey
+        from sqlalchemy import Integer         
+        from sqlalchemy import String         
+        from sqlalchemy.orm import declarative_base
+        from sqlalchemy.orm import relationship
+
+        Base = declarative_base()
+
+    5.2 # CREATING MODELS 
+
+        sintaxis:
+
+            types = String(),Integer
+
+            class Table_name(Base):
+                __tablename__ = "table_name"
+
+                columns 
+                .
+                .
+                .
+
+                def __repr__(self):
+
+                    **This method returns the whole representation
+                    of the table when used to make queries  
+
+                    return f"table_name(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
+
+
+        example: 
+
+            **With one-to-many relation
+
+            class Manager(Base):
+
+                __tablename__ = "manager"
+
+                id=Column(Integer,primary_key=True),
+                name=Column(Varchar(20),nullable=False)
+                employee_id=Column(Integer,ForeignKey("employee.id"))
+                employee=relationship("Employee")
+
+        example :
+
+            **With one to one relation:
+
+            class Child(Base):
+                __tablename__ "Parent"
+                id=Column(Integer,primary_key=True),
+                name=Column(String(20),nullable=False)
+                parent=relationship("Parent",back_populates="parent",uselist=False)
 
         
+        example :
+
+            **with many-to-many relation 
+
+            association_table = Table(
+            "association",
+            Base.metadata,
+            Column("left_id", ForeignKey("left.id")),
+            Column("right_id", ForeignKey("right.id")),
+        )
+
+
+        class Parent(Base):
+            __tablename__ = "left"
+            id = Column(Integer, primary_key=True)
+            children = relationship("Child", secondary=association_table)
+
+
+        class Child(Base):
+            __tablename__ = "right"
+            id = Column(Integer, primary_key=True)

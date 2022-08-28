@@ -366,7 +366,7 @@ DDL
     **add,create or mofify columns and data in tables
     **sintaxis:
 
-        ALTER TABLE table_name ddl command 
+        ALTER TABLE table_name ddl_command 
     
     commands : 
     
@@ -1712,6 +1712,10 @@ OPRIMIZATION
         );
 
         **queries that aim at last_name and first_name will run faster.
+
+        **also :
+
+            ALTER TABLE ADD INDEX index_name(columns)
 
 # CHECK OPTIMIZATION WITH CLAUSE EXPLAIN
 
