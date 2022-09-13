@@ -14,6 +14,14 @@ INDEX
         3.3 # ROUTES TABLES 
 4.0 # ACL (Access control list )
 5.0 # CREATE A SUBNETWORK
+6.0 # SET PRIVATE SUBNET TO PUBLIC SUBNET
+        6.1 # PUBLIC SUBNET CONCEPT
+        6.2 # CREATING A PUBLIC SUBNET
+        6.3 # LINK PUBLIC SUBNET TO AN INTERNET GATEWAY 
+                6.3.1 # SET AND INTERNET GATEWAY 
+                6.3.2 # LINK PUBLIC IP TO INTERNTET GATEWAY THROUGH ROUTE TABLE 
+                6.3.3 # ASSOCIATE PUBLIC IP 0.0.0.0/0 TO PUBLIC SUBNET 
+7.0 # PROPERTIES OF PUBLIC SUBNETS 
 
 
 
@@ -137,7 +145,7 @@ AWS USER MANUAL
 
 3.0 # VPC NETWORKING
                 
-
+        3.0 # (CHECK AWS_VPC_STRUCTURE.pdf)
         All concept in AWS are related with the Region.
 
         3.1 # INTRODUCTION TO VPC 
@@ -189,7 +197,7 @@ AWS USER MANUAL
                 When you create a VPC a route table is create by default.
                 You can see this in your VPC --> main route table 
 
-                Right now our route table is on associated to a subnetwork.
+                Right now our route table is not associated to a subnetwork.
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -228,6 +236,10 @@ AWS USER MANUAL
 
         **This rule allow access to the ip 0.0.0.1/24 throug the port 80 using http protocol.
 
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------------------------------------------------
 
 5.0 # CREATE A SUBNETWORK
 
@@ -240,4 +252,207 @@ AWS USER MANUAL
                               
                 
                 - Select a VPC 
-                - Set subnet name
+                - Set subnet name : my_private_subnet
+                - select AZ
+                - select CIDR block ip range : 10.0.0.0/28 
+                - set tags 
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+6.0 # SET PRIVATE SUBNET TO PUBLIC SUBNET
+
+        6.1 # PUBLIC SUBNET CONCEPT
+
+        **By default a subnet is always private.
+        **In order to provided internet access to a subnet is necessary to create a component 
+        called internet gateway.
+
+        Lets make a summary of the infrastrucutre so far :
+
+                REGION (Virginia WEST)
+                |
+                |  VPC (duftcola-vpc)
+                |  |      
+                |  |
+                |  |  CDIR BLOCK  (10.0.0.0/24 --> 10.0.0.0 - 10.0.0.255)
+                |  |  |
+                |  |  |
+                |  |  |  > PRIVATE SUBNET 10.0.0.0/28   10.0.0.0-10.0.0.15/28
+                |  |  |
+                |  |  |  > PUBLIC SUBNET  10.0.0.16/28  10.0.0.16-10.0.0.31/28
+
+                **Both networks aim to the main route table 10.0.0.0/24
+                **We must connect our public subnet to a internet gateway 
+                **To do so the main route table must choose the public subnet 
+                and aim it to an internet gateway 
+
+                PUBLIC SUBNET ---> main route table ----> internet gateway ---> internet
+
+        
+        6.2 # CREATING A PUBLIC SUBNET
+
+                VPC ---> subnets ---> create subnets 
+                
+                > PUBLIC SUBNET  10.0.0.16/28  10.0.0.16-10.0.0.31/18
+                
+                **initially a your public subnet is no different to aprivate subnet
+                **tag properly you subnet showing this is going to be 
+                your public subnet.
+
+        
+        6.3 # LINK PUBLIC SUBNET TO AN INTERNET GATEWAY 
+
+                6.3.1 # SET AND INTERNET GATEWAY 
+
+                        VPC ---> internet gateway ---> create internet gateway 
+
+                        ** Tag your internet gateway
+                        ** By default your new internet gateway is detached .
+                        It is not linked to a VPC
+                        
+                        **Attach you internet gateway to your VPC 
+
+                        VPC--> internet gateway --> actions --> attach to VPC 
+
+                6.3.2 # LINK PUBLIC IP TO INTERNET GATEWAY THROUGH ROUTE TABLE 
+
+                        **Create a new route table linking your public subnet to your internet 
+                        gateway.
+
+                        VPC --> route tables --> create route table 
+
+                        **In your new route table 
+
+                        we have so far : 
+
+                                - my_public_subnet: 10.0.0.16/28
+                                - my_internet_gateway : detached
+                                - my-public-route-table
+
+                        routes --> edit routes ---> add route
+
+                        ** select a route in your public subnet : 0.0.0.0/0 
+                        ** 0.0.0.0/0 means any IP
+                        ** link it to your internet gateway that should be visible now.
+                        ** Now our routes table have the ips :
+
+                                - 10.0.0.0/24 : local  that allow us to connect any service in our VPC 
+                                - 0.0.0.0/0 : Internet gateway that allow us to access internet 
+
+                
+                6.3.3 # ASSOCIATE PUBLIC IP 0.0.0.0/0 TO PUBLIC SUBNET 
+
+                        VPC --> Route tables ---> edit subnet associations
+
+                        associate my public subnet
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+7.0 # PROPERTIES OF PUBLIC SUBNETS 
+
+        ** Select you public subnet 
+        ** actions --> subnet edit subnet setting 
+         
+        - enable auto-assing ip4 : When a EC2 machine is created provide automatically
+            and IP4 otherwise you must assing the ip manually
+        
+        - enable resource name DNS : ???
+
+        - host name type 
+
+                - Resource name : Sets the name of the machine based on the instance and region
+                - IP name : Name based on the ip address
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+8.0 # DELETE A VPC 
+
+        VPC ---> ACTIONS --> DELETE VPC
+        
+        **This will also try to delete anything that inherits from this VPC 
+
+                - route table 
+                - subnets 
+                - internet gateway
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+9.0 # EC2 MACHINES
+
+        9.1 # CREATE AN INSTANCE 
+
+        EC2 ---> launch instance --> **follow standard procedure to create and instance 
+
+        9.2 # KEY PAIR 
+
+                **key pairs allow us to connect directly to our machine in remote.
+                **The result of this, is a .pem file we can use later to connect remotely by
+                ssh.
+
+                By default the encryption type is :
+
+                        RAS 
+                
+                By default the file  type is :
+
+                        RAS **This allow uus to connect by ssh 
+                
+                ** .ppk can be used to connect by putty
+
+
+        9.3 # CONNECT TO AN EC2 INSTANCE USING SSH
+
+                EC2 ---> instance ---> (select you instance) --> connect 
+
+                **This will display several connection methods :
+
+
+                - EC2 Instance connect : Allow us connect directly from the browser in
+                                        the aws console. Not all AMIS support this feature.
+
+                - Session Manager : Requires to install an SSM agent in the instance . 
+                                    Afterwards then is possible to connect by this method
+
+                - SSH client : Most commond method of connection .
+                               Allows to connect by ssh using the generated .pem file in 
+                               the previous step.
+
+                - EC2 Serial console: Needs to be configured when creatin the instance. 
+
+
+        9.4 # CONFIGURE SECURITY GROUP OF THE INSTANCE   
+
+                EC2 ---> 
+                        security --> 
+                                security groups --> <select your ec2 machine >
+                                                                                ---> inbound rules
+
+                **Here we must define the inbound rules of who 
+                can access to our EC2 instance and from which ip and port 
+
+                **Edit inbound rules 
+
+                **Add new rule 
+
+                **Select to allows http port 80 0.0.0.0/0
+                **This will allo to access by http through the port 80 from any ip
+                **Later when we have our public subnet we can define an IP for our service 
+
+
+
+
+

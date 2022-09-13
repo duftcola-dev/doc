@@ -1,9 +1,10 @@
-#Django installation  :
-    # Create a virtual environment 
+1.0 # DJANGO INSTALLATION 
+    
+    1.1 # CREATE VIRTUAL ENVIRONMENT
 
     pip install Django==4.0.2
 
-    # make sure django can be seen by python by activating the python terminal
+    **make sure django can be seen by python by activating the python terminal
     and then : 
 
     import django ; print(django.get_version())
@@ -12,302 +13,632 @@
 
     python -m django --version
 
+------------------------------------------------------------------------------------
 
-#create a django project
 
-    django-admin startproject mysite
+-------------------------------------------------------------------------------------
+
+2.0 # CREATE A DJANGO PROJECT
+
+    2.1 # CREATE A PROJECT  
+
+    run : 
+        django-admin startproject mysite
 
     ** a project folder/container is created .
     ** this is a project , not a an app
     ** a django project can contain many apps
     ** every django project contains at least one app running.
     ** in the project manage.py is a CLI tha can be used to manage your project
-    ** /mysite is the actual directory where your app runs
 
+
+    2.2 PROJECT DRESCRIPTION
+
+    ** /mysite: is the actual directory where your app runs
     ** mysite/settings.py: Settings/configuration for this Django project.
+
+                            - INSTALLED APPS : List of the current apps running in you project.
+                                                Any new created app must be added to this list.
+                            
+                            - TEMPLATES : A list containing the settings for all template engines 
+                                          to be used with Django --> 'django.template.backends.jinja2.Jinja2'
+                            
+                            - ROOT_URLCONF: Default root url of the app
+
+                            - MIDDLEWARE: Middleware is a framework of hooks into Django’s 
+                                          request/response processing.Each middleware component is responsible for doing 
+                                          some specific function.
+                            
+                            - ALLOWED_HOSTS: A list of strings representing the host/domain names 
+                                             that this Django site can serve --> ['.localhost', '127.0.0.1', '[::1]','www.example.com']
+                            
+                            - DATABASES: A dictionary containing the settings for all databases to be 
+                                         used with Django.
+                            
+                            - STATIC_URL
+
     ** mysite/urls.py: The URL declarations for this Django project; a “table of contents” of your Django-powered site.
+                            
+                            - Any url of your apps must be included in this file.
+
     ** mysite/asgi.py: An entry-point for ASGI-compatible web servers to serve your project.
+                            
+                            - asgi are asyncronous servers.
+
     ** mysite/wsgi.py: An entry-point for WSGI-compatible web servers to serve your project.
+                            
+                            - wsgi  are servers based on workers.
+
+    ** manage.py: A cli to run administration functions in your project like 
+                            
+                            - python manage.py runserver : start the django server
+                            - execute database migration with alembic
 
 
+    2.3 # CREATE DEVELOPMENT AND PRODUCTION ENV 
 
-# in order to create an app inside a django project run  :
+        **In you project folder (not your app folder)
+        ** create a new folder settings/
+        ** create the following files in settings/
+          
+          - base.py : Contains a copy of the basic configuration in settings.py like 
+                        - BASE_DIR 
+                        - SECRET KEY 
+                        - ALLOWED_HOSTS 
+                        - INSTALLED_APPS
+                        - MIDDLEWARE
+                        - ROOT_URLCONF
+                        - TEMPLATES
+                        - WSGI_APPLICATION
+                        - AUTH_PASSWORD_VALIDATORS
+                        - LANGUAGE_CODE = 'en-us'
+                        - TIME_ZONE = 'UTC'
+                        - USE_I18N = True
+                        - USE_TZ = True
+                        - STATIC_URL
+                        - DEFAULT_AUTO_FIELD
 
-    python manage.py startapp <app_name>
-    
-    example : python manage.py startapp meetups_app
+          - dev.py : Contains the configuration used for development. Inherits from base.py 
+                        - DEBUG = True
+                        - ALLOWED_HOSTS
+                        - DATABASES ** We will use differenta databases for dev/prod/testing
+                        - STATIC_URL
+                        
+          - prod.py: Contains the production configuration 
+          - test.py: Contains the testing configuration 
+          - __init__.py
 
-    ** /meetups_app/views.py
-    ** inside the created app meetups_app create the file views: 
-    ** views.py : contain the functions that manage the logic behind each endpoint of the created app
-    ** inside views.py
+        ** Eliminate the old settings.py 
+        ** Now execute the django server especifying the environment you will use : dev/prod/test in our new settings/ folder :
 
-    from django.shortcuts import render
-    from django.http import HttpResponse
-    # Create your views here.
+            sintaxis :
 
-    def index(request): #this is a function that will handle certain logic
-        return HttpResponse("hello world")
+            python manage.py runserver --settings=project_folder.settings_folder.env_file
 
-    ** /meetups_app/urls.py
-    ** this file will link the enpoints of your app to the logic in the functions in views.py
-
-    from django.urls import path
-    from . import views
-    urlpatterns = [
-        path("meetups/",views.index)  # our-domain.com/meetups
-    ]
-
-
-    urls.py------>views.py
-
-    ** register your app inside the django project
-    ** /mysite/settings
-
-    INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'meetups_app'   <------------------ add your new app here
-    ]
-
-
-    ** finally connect the url of your app to the root url of the project
-    ** /mysite/urls
-    from django.contrib import admin
-    from django.urls import path, include 
-
-    urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('',include('meetups_app.urls')) <---/meetups_app/urls   # we are adding the urls of our app to the project
-    ]
-
-    /mysite/urls ----> meetups_app/urls--->meetups_app/views
-
-
-# creating templates 
-
-** templates allows us to create html templates using the jinja2 engine in order to retun html HttpResponse
-** create a templates folder in the meetups app 
-** /meetups_app/templates
-** inside template create a folder with your app app_name
-
-    /meetups_app/templates/meetups_app
-
-** inside /meetups_app/templates/meetups_app add your first template file index.html
-
-** now include your template in your views.py file
-
-    from django.shortcuts import render
-    from django.http import HttpResponse
-    # Create your views here.
-
-    def index(request):
-        return render(request, 'meetups_app/index.html') <----notice the path is relative from the folder templates
-
-# adding javascript / css to to your templates
-** in order to inlcude this type of content in your templates it is required "static content"
-** create a static folder in you meetups_app:
-
-    /meetups_app/static/meetups_app
-
-    ** add subfolders for scripts and styles
-
-    /meetups_app/static/meetups_app/styles
-    /meetups_app/static/meetups_app/scripts
-
-** reference your html templates to your static style files
-
-example : 
-
-        {% load static %}   <----  this tells django that static content will be used
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href ="{% static 'meetups_app/styles/base.css' %}"> <---- link static css file
-        <title>meetups_app</title>
-    </head>
-    <body>
-        <hi>Meetups app</hi>
-        <p>HELLO WORLD</p>
-    </body>
-    </html>
-
-    *** YOU MUST RESTART THE SERVERS WHEN USING STATIC FILES IN ORDER TO SEE THE CHANGES
-
-# passing data to templates
-** meetups_app/views
-
-    def index(request):
-        data = [
-            {"title" : "A  first meetup app"},
-            {"title" : "A second meetup app"}
-        ]
-        return render(request, 'meetups_app/index.html',{"data" : data}) <-- data will be the accessible key from the template
-
-    ** in the html
-    <h2>{{ data.0.title  }}</h2>  <--- this outputs  : "A  first meetup app"
-
-# conditions and loops in templates :
-
-        <hi>Meetups app</hi>
-    <p>HELLO WORLD</p>
-    <p>conditions : </p>
-    {%if show_meetups %}
-        <h2>{{ data.0.title  }}</h2>
-    {% else %}
-        <h2>{{ data.1.title  }}</h2>
-    {% endif %}
-    <p>for loop : </p>
-    {% for item in data %} 
-        <p>{{item.title}}</p>
-    {% endfor %}
-
-# passing url parameters 
-
-    **meetups_app/urls
-
-     path("meetups/<slug:meetup_slug>",views.details) # a dynamic url-path-segment
-
-    ****meetups_app/views
-
-    def details(request,meetup_slug): <---- notice the meetup_slug parameter
-    print(meetup_slug)
-    selected_meetup = {
-        "title" : "A first meetup",
-        "description" : "this is some practice app",
-        "slug" : "first-meet-up"
-    }
-    return render(request,'meetups_app/details.html',{
-        "title" : selected_meetup["title"],
-        "description" : selected_meetup["description"]
-
-        })
-
-# Dynamic link update 
-# Allows django update automatically the links of the pages
-# if the root link is update in urls.py . It does this by placing an unique id to the urls :
-
-    **/meetups_app/urls
-    path("meetups/<slug:meetup_slug>",views.details,name="meetup_details_page")  **name="meetup_details_page" name is an unique id  for this path
-
-    ** if this path is modified all the links with this id also are update automatically
-    ** consider it best practices
-
-    example :
-
-        <div class="meetup-actions">
-        <a href="{% url 'meetup_details_page' %" class="btn" >More details</a>  <--- the 'url' word creates the bounding with the id
-        </div>  
-
-
-         {% for item in data%}
-            <a href="{% url 'meetup_details_page' item.slug %" class="btn" >More details</a>
             
-            ** link id + segment url meetup_slug coming from dynamic data
+            example:
+            
+            python manage.py runserver --settings=mysite.settings.dev
 
 
+        **We can also set the default configuration of django in the manage.py file at : 
 
-#Database and model creation : 
-
-    **models are representations of tables in my sqlite that comes by default with django
-    ** in order to create a model create a class in meetups_app/models :
-
-    class meetup(models.Model):
-
-        id = models.BigAutoField(primary_key=True)
-        title  = models.CharField(max_length=200)
-        slug = models.SlugField(unique=True)
-        description = models.TextField(max_length=1000)
-
-    **this class will represent a table with fields specified in the class
-    ** id = models.BigAutoField(primary_key=True) defines id as an autoincrement primary key
-
-# Create database tables from models
-
-    **once your models have been created you can turn them into tables by executing the command:
-
-        python manage.py makemigrations   <--- this will create a table for each model and their relations
-        python manage.py migrate <-- this will add the tables to the database
-       
-
-# use the admin console
-
-    ** you can manage certain aspects of your app with admin console by running you server and
-    ** accesing the admin console form you browser:
-
-        localhost/admin   <-- notice you cannot access initially this since you first need to create a super user
-
-    *** to create a super user run the command : 
-
-        python manage.py createsuperuser
-
-    ** complete the registering process and now you can access the admin console
+            os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')  (old config)
+            |
+            |--> os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings.dev')  (new config for development)
 
 
-# manage models from admin console 
+    2.4 # CREATE A TEMPLATES FOLDER
 
-    **in order to manage your models with the admin console you models need to be registered at ehte admin.py file in 
+        **In your project folder create a templates/ folder.
+        **This folder will store the html files of each of your apps.
 
-    mysite/meetups_app/admin.py : 
+        example : 
 
-        from .models import meetup
+            my_site/
+                setting/
+                templates/
+                asgi.py
+                wsgi.py
+                urls.py
         
-        admin.site.register(meetup)
+        **Inside the folder templates/ create a subfolder for each app in your project.
+        **Store inside the subfolder the html files belonging to each app 
+
+        example : 
+
+            my_site/
+                setting/
+                templates/
+                    my_app/
+                        index.html
+                asgi.py
+                wsgi.py
+                urls.py
+
+        ** In order to make this architecure effective the localtion of templates/
+        mus be specified in the new settings/base.py 
+        ** Add path of the new folder templates/ to the templates path
+
+        example :
+
+            setting/base.py 
 
 
-# make queries to the datbase using models
+         TEMPLATES = [
+            {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [BASE_DIR / 'templates'],
+            'APP_DIRS': True,
+            'OPTIONS': {
+        
+        **BASE_DIR : Is the root location of your project folder.
+                    BASE_DIR / 'templates' is telling your templates will be 
+                    stored in the folder templates/ inside you project folder 
 
-    ** first import the model to your view
-    ** meetups_app/views
+        **Now whenever you render a template you must use as prefix you app template folder 
 
-    from .models import meetup
-
-    data = meetup.objects <--- objects is a property inherited by the models class
-
-    ** objects allows us to make queries
-
-    example : 
-
-            data = meetup.objects.all()  <--- equivalent in SLQ to SELECT * FORM MEETUP
-
-    ** and spesific value  : 
-
-            data = meetup.objects.get(id=some_id) <--- we search matches based on keys
+        example :
             
-            or
+            my_site/
+                setting/
+                templates/
+                    my_app/
+                        index.html
 
-            data = meetup.objects.get(slug=some_slud_data)
+            class HomeView(View):
+                template_name= "my_app/index.html"
 
-            ** remember that one of the arguments in the model was id
-            ** it is advisable to warp the queries wiht try-exept blocks ** 
+                def get(self,request):
+                    return render(request,self.template_name)
 
-    ** creating new entries in the database : 
+    2.4 # CREATE A ROOT USER 
 
-        data = new Meetup(args="stuff",args2="more_stuf") <--- notice the models do not need a __init__ method to be initilyzed
-        data.save()
+        **Create the root user of your project:
+
+            python manage.py createsuperuser
 
 
-    **deleting objects : 
 
-        meetup.delete() <---returns the deleted objects
+--------------------------------------------------------------------------------------
 
-    ** delete with filters : 
 
-        result = meetup.objects.get(id=12)
-        result.delete()
+--------------------------------------------------------------------------------------
 
-    ** delete all :
+3.0 # CREATE A DANJGON APP INSIDE YOUR RPOJECT 
 
-        meetup.objects.all().delete()
+    3.1 # CREATE DJANGO APP
+
+    sintaxis:
+        python manage.py startapp <app_name>
     
-# run servers
+    example : 
+        **create a folder where we will store our applications called applications.
+        **do not use the word apps since is reserved for django
+        **create init file
+        ** create your first app inside our applications/ folder
 
-    python manage.py runserver
+            /applications
+            /applications/__init__.py
+            cd applications/
 
+            django-admin startapp my_app
+    
+    ** This will create an app inside your project 
+    ** Your app as the following structure:
+
+        - admin.py: Allows you to administrate the metadata of your database models.
+        - apps.py:
+        - modesl.py: Your database models.  
+        - tests.py: Your app tests
+        - views.py:
+        - migrations/:
+
+    3.1 # REGISTER DJANGO APP IN PROJECT
+
+        ** Each app created needs to be added to your base settings file into INSTALLED_APPS 
+        ** Currently our base settings are in the file settings/base.py of our project
+        ** Register you new app in INSTALLED_APPS --> 'applications.my_app.apps',
+
+        example:
+
+            INSTALLED_APPS = [
+            'django.contrib.admin',
+            'django.contrib.auth',
+            'django.contrib.contenttypes',
+            'django.contrib.sessions',
+            'django.contrib.messages',
+            'django.contrib.staticfiles',
+            'applications.my_app',
+            ]
+
+
+    3.2 # UPDATE YOUR APP APPS.PY FILE 
+
+        ** In applications/my_app/
+        ** In order for django to find your app in the folder applications we must 
+           modify the apps.py file in each app .
+        ** Add the applications/ folder name to your app name:
+
+        example : **originally when the app is created 
+
+            class DepartamentoConfig(AppConfig):
+                default_auto_field = 'django.db.models.BigAutoField'
+                name = 'my_app'  ** ---> change to --> name = 'applications.my_app'
+        
+        example:
+
+            class DepartamentoConfig(AppConfig):
+                default_auto_field = 'django.db.models.BigAutoField'
+                name = 'applications.my_app'
+
+-----------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------------------------
+
+4.0 # ROUTING/VIEWS
+
+    4.1 # CLASS BASED VIEWS 
+
+        **The concept of class based view is :
+
+            - A class that inherits from the class View 
+            - the class methods correspond to http request method 
+                - get()
+                - post()
+                - put()
+            - The class is passed to the main router as whole wiht the method as_view()
+        
+        example :
+
+            /app/views  **In our app 
+
+            from django.views import View
+
+            class MyView(View):
+
+                def get(request:HttpRequest,*args,**kwargs):
+                    ...
+
+                def post(request:HttpRequest,*args,**kwargs):
+                    ...
+
+    4.2 # ADDING VIEW TO MAIN ROUTER 
+
+            **Once the view in the previous example is created we add it 
+            the project router :
+
+        example: **project folder 
+
+            /my_site/  
+                urls.py
+
+            from applications.my_app.views import MyView
+
+
+            urlpatterns = [
+                path('admin/', admin.site.urls),
+                path('index/',MyView.as_view()),
+            ]
+
+            **Now our view is linked to the router of our project
+
+
+    4.2 # ACCESSING QUERY DATA / BODY DATA 
+        
+        **Accessing queries data and json data in request
+
+        example : GET 
+
+            ** getting headers :
+
+                request.headers 
+            
+            ** method type 
+
+                request.method
+            
+            **query params 
+
+                request.GET.get("param_name","")
+            
+        example : POST 
+
+            **getting json data :
+
+                payload = json.loads(request.body)
+
+    4.3 # RESPONSE TYPES 
+
+        - Response using the HttpResponse object 
+
+            - does not support json 
+            - responses are in plain text 
+
+            example :
+
+                response = HttpResponse()
+                response.headers={"Content-Type":"text/plain"}
+                response.status_code=200
+                response.content="Hello"
+                return response 
+        
+        - Response using the JsonResponse object 
+
+            - supports json 
+            
+            example : 
+                payload : dict
+                JsonResponse(payload,status=201)
+---------------------------------------------------------------
+
+
+---------------------------------------------------------------
+
+5.0 # ROUTING/VIEWS 
+
+    5.1 # CONCEPT OF VIEW 
+
+        **Views are meant to be the rendering of web pages
+        **In order to use views we first need to create the folder 
+        
+            templates/
+
+        **Then add html files to this folder . These will be our views :
+        
+        my_site/
+            setting/  
+            templates/ 
+                myapp/
+                    index.html
+                    form.html
+                    pages.html 
+                    .
+                    .
+                    .
+    
+    5.2 # CREATING A VIEW
+
+        **In order to create a view we need :
+            - a class that inherits from the View class
+            - the class must have a template_name attribute 
+            - the value of template_name is an html file in the folder templates/
+            - In order to send a template as response we must use the method render
+        
+        sintaxis:
+
+            return render(request,template,template_args)
+
+        example :
+
+            class IndexView(View):
+                template_name = "myapp/index.hmtl"
+
+                def get(self,request):
+                    return rende(request,self.template_name,{"template_arg":"value"})
+
+          
+    5.3 # MAPPING VIEWS TO MAIN ROUTER
+
+        **In your app folder create an urls.py file 
+        **Import all the urls of you app to this file 
+
+        my_app/
+            ulrs.py/
+
+
+        example:
+
+            from django.urls import path 
+            from . import views 
+
+            urlpatterns = [
+                path("home/",views.HomeView.as_view()),
+                path("data/",views.TestView.as_view()),
+            ]
+        
+
+        **mapp your app urls to the project main router 
+        
+        mysite/
+            urls/
+        applications/
+            my_app/
+                ulrs.py/
+
+
+        **at mysite/
+                urls/
+
+        from django.urls import path,include
+
+        urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('',include("applications.my_app.urls")),
+        ]
+--------------------------------------------------------------------
+
+
+--------------------------------------------------------------------
+
+6.0 # DJANGO ORM AND DATABASES
+
+    **In your app folder my_app in the file models.py define your
+    database models 
+
+    my_app/
+        model.py
+
+    
+    6.1 # DEFINE A TABLE 
+
+        **Define the table test
+        **Define the table attributes
+
+        example:
+
+        class Test(models.Model):
+            id = AutoField(primary_key=True)
+            name = CharField("name",max_length=20,null=False)
+            email = EmailField("email",max_length=50,null=False)
+
+
+    6.2 # CREATE TABLE IN DATABASE
+
+        **In order to create the tables defined by your models 
+        execute .
+        **This command creates the migrations file that will make changes in your 
+        database.
+
+        python manage.py makemigrations
+
+        
+        **Apply changes to database once the migration file have been created.
+
+        python  manage.py migrate
+
+    6.3 # ADD TABLE TO THE ADMIN CONSOLE 
+
+        **In your app folder my_app/
+        **Add the table classes to your admin.py file.
+          This will allow you to interect with the
+          tables from the admin user interface
+        
+        example :
+
+            from .models import Test
+            admin.site.register(Test)
+    
+    6.4 # MANAGE YOUR TABLES 
+
+        ** access your table in the django admin by 
+        running the sever :
+
+            python manage.py runserver 
+
+        **access your admin using the /admin/ route in the url
+
+    
+    6.5 CREATE A VIEW WITH DATABASE DATA 
+
+
+        class ModelTestView(View):
+
+            def get(self,request):
+                model = Test                          **select model
+                template_name = "home/test.html"      ** select template
+                query = Test.objects.all()            ** SELECT * FROM Test
+                data = query.values()                 ** get values as dict
+                              
+                context={                             **load data in a context dict
+                    "table_items":data
+                }
+
+                return render(request,template_name,context)    **render template with data
+
+        
+        **create the view test.html in template/
+
+        <h1>Listing elements from a table</h1> 
+            {{ table_items }}
+
+            <ul>
+            {% for item in table_items %}
+                <li>
+                <p>{{item.name}}</p>
+            </li>
+            {%endfor%}
+            </ul>
+
+-------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------
+
+7.0 # DJANGO MODEL fields 
+
+    CharField : field made for text
+    AutoField : an integer that automatically increments with ids.
+    BigAutoField : bigger than AutoField 9223372036854775807
+    IntegerField : for intergers 
+    BoleanField : True/False 
+    DateField : For date data
+    DateTimeField: For date data represeted by datetime.datetime
+    TestField : Large text field for text areas 
+    DecimalField: for decimal numbers.
+
+-----------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------------
+
+8.0 # DJANGO ORM ADVANCED 
+
+    8.1 # CREATING OBJECTS INTO THE DATABASE 
+
+        sintaxis :
+
+            m = Model_name(table_item = "item_value )
+            m.save()
+
+        example :
+
+            b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
+            b.save()
+
+        **This is the quievalent of an INSERT operation
+        **m.save is the same as a mysql commit
+
+    8.2 # UPDATING VALUES 
+
+        **Get an object from the database 
+        **update object property 
+        **save 
+
+        example :
+            b = Model_name.get(id=2)
+            b.name = "new name" 
+            b.save()
+        
+        **This is the equivalent of an update
+
+
+    8.3 # RETREIVING DATA 
+
+        8.3.1 # RETREIVE WITH FILTERS
+
+            object = Blog.objects.filter(name="robin")
+
+            or 
+
+            object = Blog.objects.get(name="Robin")
+
+            ** filter returns n results
+            ** get can only return 1 result if exists.
+               If not exists then raises a DoesNotExists exception
+
+        8.3.2 # RETREIVE ALL  DATA 
+
+            object = Blog.objects.all().filter(date=2006)
+
+        8.3.3 # RETREIVE EXCLUDING DATA 
+
+            object = Blow.objects.exclude(date = datetime.dateime.toda()).filter(date = datetime.date(2006,1,20))
+
+        8.3.4 # STACKING QUERY SETS 
+
+            **Each query set you stack produces a more refined query 
+            **query sets are lazy . This only generates queries , does not execute them
+            in the database.
+            **The query is only executed in the database on print(query3)
+
+            query1 = Blog.objects.filter(name="Robin")
+            query2 = query1.exclude(name="Osbald")
+            query3 = query2.filter(date=datetime.date.today())
+
+            print(query3) **database activity only happends here 
+            values = query3.values()  ** or here
+
+
+        8.3.5 # PAGINATION

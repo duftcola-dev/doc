@@ -1,0 +1,177 @@
+
+
+1.0 # AWS CLI INSTALLATION (LOCAL INSTALLATION)
+
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    - unzip awscliv2.zip
+    - sudo ./aws/install
+
+    **Check the installation have been sucessfull
+
+    - aws --version
+
+    sintaxis :
+
+        aws [options] <command> <subcommand> [parameters]
+
+2.0 # CONFIGURING AWS CLI  (LOCAL)
+
+    2.1 # CREATING CONFIGURATION AND PROFILE
+
+        **Configuring the aws cli will allow certain user to access AWS  from the cli . 
+        **The user must have access to the services is meant to use .
+        **Make sure to create an user first ad have its accesskey and secret key 
+
+        **You can the assign this configuration to a profile.
+        **A profile is a tag for the setting or data of a user.
+        **You can have any number of profiles in your aws cli.
+        
+        example: 
+
+            aws configure --profile <profile_name> 
+
+        fill the form :
+
+            AWS Access Key ID [None]: AKIAI44QH8DHBEXAMPLE
+            AWS Secret Access Key [None]: je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY
+            Default region name [None]: us-east-1
+            Default output format [None]: text
+        
+        **You can also provide this information by importing it from a csv file. 
+
+            aws configure import --csv <file_path.csv>
+
+
+
+3.0 # DEPLOYING TO AWS ECS (Elastica container registry)
+
+    3.1 # CREATE A REPOSITORY
+
+        ** AWS allows to create your own repositories
+        ** This are ECR (Elastic container repository)
+        ** Git actions performed in your github repository will push 
+        you images to the specified privte repositoy in aws
+
+        example : 
+
+            aws ecr create-repository \
+                --repository-name MY_ECR_REPOSITORY 
+                --region MY_AWS_REGION
+        
+        **These will be variables that will be used in a workflow 
+        so their name is relevant.
+
+        - MY_ECR_REPOSITORY 
+        - MY_AWS_REGION
+        - ECS_SERVICE
+        - ECS_CLUSTER
+
+    3.2 # CREATE AN AWS EC2 SERVICE 
+
+        **Create a regular ECS service in AWS
+        ** Your service name and cluster name will correspond to the 
+        value of :
+
+            - ECS_SERVICE
+            - ECS_CLUSTER
+
+    3.3 # STORE ECS TASK DEFINITION 
+
+        **Store the aws ECS task difinition as a json file
+        in your github repository .
+        **The file should like the ouput of the following command :
+
+            aws ecs register-task-definition --generate-cli-skeleton
+
+        **Ensure you set the variables in in the git workflow : 
+
+            - ECS_TASK_DEFINITION
+            - CONTAINER_NAME  ** as the value of containerDefinitions 
+            
+
+    3.4 # CREATE ACCESS KEY | AWS SECRET KEY 
+
+        **Create gihub actions secrets AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY 
+        for the AIM user access.
+
+
+    3.5 # (OPTIONAL) CONFIGURE PRODUCTION | TEST | DEVELOPMENT | ENVIRONMENTS
+
+
+    3.4 # EXAMPLE OF A WORK FLOW :
+
+        # This workflow uses actions that are not certified by GitHub.
+        # They are provided by a third-party and are governed by
+        # separate terms of service, privacy policy, and support
+        # documentation.
+
+        # GitHub recommends pinning actions to a commit SHA.
+        # To get a newer version, you will need to update the SHA.
+        # You can also reference a tag or branch, but the action may change without warning.
+
+        name: Deploy to Amazon ECS
+
+        on:
+        push:
+            branches:
+            - main
+
+        env:
+        AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
+        ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
+        ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
+        ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
+        ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+                                                    # file, e.g. .aws/task-definition.json
+        CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
+                                                    # containerDefinitions section of your task definition
+
+        jobs:
+        deploy:
+            name: Deploy
+            runs-on: ubuntu-latest
+            environment: production
+
+            steps:
+            - name: Checkout
+                uses: actions/checkout@v3
+
+            - name: Configure AWS credentials
+                uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
+                with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ env.AWS_REGION }}
+
+            - name: Login to Amazon ECR
+                id: login-ecr
+                uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
+
+            - name: Build, tag, and push image to Amazon ECR
+                id: build-image
+                env:
+                ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+                IMAGE_TAG: ${{ github.sha }}
+                run: |
+                # Build a docker container and
+                # push it to ECR so that it can
+                # be deployed to ECS.
+                docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+                docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+                echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+            - name: Fill in the new image ID in the Amazon ECS task definition
+                id: task-def
+                uses: aws-actions/amazon-ecs-render-task-definition@97587c9d45a4930bf0e3da8dd2feb2a463cf4a3a
+                with:
+                task-definition: ${{ env.ECS_TASK_DEFINITION }}
+                container-name: ${{ env.CONTAINER_NAME }}
+                image: ${{ steps.build-image.outputs.image }}
+
+            - name: Deploy Amazon ECS task definition
+                uses: aws-actions/amazon-ecs-deploy-task-definition@de0132cf8cdedb79975c6d42b77eb7ea193cf28e
+                with:
+                task-definition: ${{ steps.task-def.outputs.task-definition }}
+                service: ${{ env.ECS_SERVICE }}
+                cluster: ${{ env.ECS_CLUSTER }}
+                wait-for-service-stability: true
