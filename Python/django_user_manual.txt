@@ -1,3 +1,52 @@
+INDEX
+
+1.0 # DJANGO INSTALLATION 
+    1.1 # CREATE VIRTUAL ENVIRONMENT
+2.0 # CREATE A DJANGO PROJECT
+    2.1 # CREATE A PROJECT  
+    2.3 # CREATE DEVELOPMENT AND PRODUCTION ENV 
+    2.4 # CREATE A TEMPLATES FOLDER
+    2.4 # CREATE A ROOT USER 
+3.0 # CREATE A DANJGON APP INSIDE YOUR RPOJECT 
+    3.1 # CREATE DJANGO APP
+    3.1 # REGISTER DJANGO APP IN PROJECT
+    3.2 # UPDATE YOUR APP APPS.PY FILE 
+4.0 # ROUTING/VIEWS
+    4.1 # CLASS BASED VIEWS 
+    4.2 # ADDING VIEW TO MAIN ROUTER 
+    4.2 # ACCESSING QUERY DATA / BODY DATA 
+    4.3 # RESPONSE TYPES 
+5.0 # ROUTING/VIEWS 
+    5.1 # CONCEPT OF VIEW 
+    5.2 # CREATING A VIEW
+    5.3 # MAPPING VIEWS TO MAIN ROUTER
+6.0 # DJANGO ORM AND DATABASES
+    6.1 # DEFINE A TABLE 
+    6.2 # CREATE TABLE IN DATABASE
+    6.3 # ADD TABLE TO THE ADMIN CONSOLE 
+    6.4 # MANAGE YOUR TABLES 
+7.0 # DJANGO MODEL fields 
+    7.1 # FIELDS
+    7.2 # PRIMARY KEYS 
+    7.3 # FOREIGN KEYS 
+    7.4 # INDEXES 
+8.0 # DJANGO ORM ADVANCED 
+    8.1 # CREATING OBJECTS INTO THE DATABASE 
+    8.2 # UPDATING VALUES 
+    8.3 # RETREIVING DATA 
+        8.3.1 # RETREIVE WITH FILTERS
+        8.3.2 # RETREIVE ALL  DATA 
+        8.3.3 # RETREIVE EXCLUDING DATA 
+        8.3.4 # STACKING QUERY SETS 
+        8.3.5 # SCAPING LIKE CHARACTER %
+        8.3.5 # DELETING OBJECTS
+        8.3.5 # PAGINATION
+9.0 # DEFYNING RELATIONAL MODELS 
+    9.1 # ONE TO ONE RELATION
+    9.2 # MANY TO ONE RELATIONS 
+    9.3 # MANY TO MANY RELATIONS 
+
+
 1.0 # DJANGO INSTALLATION 
     
     1.1 # CREATE VIRTUAL ENVIRONMENT
@@ -558,15 +607,72 @@
 
 7.0 # DJANGO MODEL fields 
 
-    CharField : field made for text
-    AutoField : an integer that automatically increments with ids.
-    BigAutoField : bigger than AutoField 9223372036854775807
-    IntegerField : for intergers 
-    BoleanField : True/False 
-    DateField : For date data
-    DateTimeField: For date data represeted by datetime.datetime
-    TestField : Large text field for text areas 
-    DecimalField: for decimal numbers.
+    7.1 # FIELDS
+
+        CharField : field made for text
+        AutoField : an integer that automatically increments with ids.
+        BigAutoField : bigger than AutoField 9223372036854775807
+        IntegerField : for intergers 
+        BoleanField : True/False 
+        DateField : For date data
+        DateTimeField: For date data represeted by datetime.datetime
+        TestField : Large text field for text areas 
+        DecimalField: for decimal numbers.
+
+        choices : is a special field the limits the options of
+                data a field can accept 
+
+                example :
+
+                JOB_CHOICES = (
+                    ('0','ADMIN'),
+                    ('1','USER'),
+                    ('2','BANNED')
+                )
+                job = models.CharField('teletrabajo',max_length='1',choices=JOB_CHOICES)
+    
+    7.2 # PRIMARY KEYS 
+        class Model_A(models.Model):
+
+            attribute_a
+            attribute_b
+            job = models.CharField('teletrabajo',max_length='1',primary_key=True)
+
+    7.3 # FOREIGN KEYS 
+
+        class Model_A(models.Model):
+
+                attribute_a
+                attribute_b
+                job = models.ForeignKey(Other_model)
+        
+    7.4 # INDEXES 
+
+        **increase the performace of your database by creating indexes 
+
+        Class Modle_A(models.Model)
+
+            attribute_a
+            attribute_b
+
+            class Meta:
+                indexes = [
+                    models.Index(fields=['attribute_a', 'attribute_b']),
+                    models.Index(fields=['attribute_a'], name='attribute_a_idx'),
+                    models.Index(fields=['attribute_b'], name='attribute_a_idx')
+                ]
+
+
+            ** models.Index(fields=['attribute_a', 'attribute_a'])
+            ** This index improves searches using both attribute_a' and 'attribute_b
+            ** This does not improves searches  using attribute_a' or 'attribute_b
+               alone
+
+            ** For that reasons additional indexes for 'attribute_a', 'attribute_b'
+            must be created
+            
+
+
 
 -----------------------------------------------------------------------------------------
 
@@ -641,4 +747,135 @@
             values = query3.values()  ** or here
 
 
+        8.3.5 # SCAPING LIKE CHARACTER %
+
+            Entry.objects.filter(headline__contains='%Ro%')
+
+            **SELECT ... WHERE headline LIKE '%Ro%';
+
+        
+
+        8.3.5 # DELETING OBJECTS
+
+            e.delete()
+
+            or 
+
+            Entry.objects.filter(pub_date__year=2005).delete()
+
+            or 
+
+            Entry.objects.all().delete(
+
+            **returns an int with the number of objects deleted
+
+
         8.3.5 # PAGINATION
+
+            Entry.objects.all()[5:10]
+
+            **returns from index 5 - 10
+
+-------------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------------
+
+9.0 # DEFYNING RELATIONAL MODELS 
+
+    9.1 # ONE TO ONE RELATION
+
+        **A one to one relations is not the same as a foreign key.
+        **One to one emplies that there can only be 1 a for 1 b 
+        so there is an implicit "unique" constraint.
+
+        sintaxis :
+
+            class Model_A(models.Model):
+
+                attribute_a
+                attribute_b
+            
+
+            class Model_B(models.Model):
+
+                attribute_a
+                attribute_b
+                attribute_c = models.OneToOneField(
+                    Model_A,
+                    on_delete=models.CASCADE 
+                    primary_key=True
+                )
+        
+
+            **Inserting data 
+
+            a = Model_A(name='Demon Dogs', address='944 W. Fullerton')
+            b = Model_B(attribute_c=a)
+            b.save()
+
+            **Querying 
+
+            r = Model_B.objects.filter(attribute_c="something)
+
+    9.2 # MANY TO ONE RELATIONS 
+
+        sintaxis:
+
+            class Model_A(models.Model):
+
+                attribute_a
+                attribute_b
+                attribute_c
+            
+            class Model_B(models.Model):
+
+                attribute_a = models.ForeignKey(Model_A,on_delete=models.CASCADE)
+                attribute_b
+                attribute_c
+
+            ***Inserting data 
+
+                r = Model_A(first_name='John')
+                r.save()
+
+                a = Article(id=None, attribute_a=r)
+                a.save()
+
+    9.3 # MANY TO MANY RELATIONS 
+
+
+        sintaxis : 
+
+            class Model_A(models.Model):
+
+                attribute_a
+                attribute_b
+                attribute_c
+            
+            class Model_B(models.Model):
+
+                attribute_a = models.ManyToMany(Model_A)
+                attribute_b
+                attribute_c
+
+            **In ManyToMany the models need to be saved first 
+            before creating the relations :
+
+            a=Model_A(attribute_a="something"...)
+            a.save()
+            b=Model_A(attribute_a="something"...)
+            b.save()
+            c=Model_A(attribute_a="something"...)
+            c.save()
+
+            r =Model_B()
+            r.save()
+
+            a.attribute_a.add(a)
+            a.attribute_a.add(b)
+            a.attribute_a.add(c)
+
+
+10 # INSTALLING POSTGRESQL IN DJANGO
