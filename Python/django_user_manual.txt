@@ -244,6 +244,7 @@ INDEX
     2.4 # CREATE A ROOT USER 
 
         **Create the root user of your project:
+        **Requires to make the first migration
 
             python manage.py createsuperuser
 

@@ -1,0 +1,136 @@
+
+0.0 # INSTALLATION 
+
+    ** installtion 
+
+        sudo apt update 
+
+    ** activate service 
+
+        sudo apt install postgresql postgresql-contrib 
+        sudo systemctl start postgresql.service 
+    
+    ** switghing to the posgresql account 
+
+        sudo -i -u postgres
+
+    ** accesing the postgresql console
+
+        psql
+
+        ** exit with 
+
+            \q
+
+1.0 # CREATE ROLE 
+
+    sudo -i -u postgres
+
+    createuser --interactive 
+
+
+    **If you want to be more specific with the access an user has use flags:
+
+    sintaxis : 
+
+        createuser [connection_options] [options] [username]
+
+    flags :
+
+        -h <host> : Specifies the host of the machine where the server runs .
+
+        -p <port> : Specifies the port for  connections 
+
+        -u <username> : username to connect as.
+
+        -w : No password 
+
+        -W : forces create user to add a possword
+
+        -c <number> : number of connections 
+
+        or
+
+        --connection-limit=number 
+
+
+        -d : allows to create database 
+
+        -D : cannot create adatabases 
+
+        -e : echo the commands the user can send to the server 
+
+        -g <role> : role of the user 
+
+        -l : The user is allowes to log in 
+
+        -L : The user is not allowed to log in.
+
+        -r : The user is allows to create roles.
+
+        -R : The user is not allowed to create roles. 
+
+        -s : The new user is super user 
+
+        -S : The user is not superuser 
+
+        ENVIRONMENT VARIABLES :
+
+            PGHOST 
+            PGPORT 
+            PGUSER 
+
+    examples :
+
+        createuser --interactive joe 
+
+    example :
+
+        createuser -h localhost -p 5000 -S -D -R -e joe 
+
+            This user :
+
+                - connects from localhost 5000
+                - Is not superuser 
+                - cannot create databases 
+                - cannot create roles 
+                - echoes its commands
+        
+    example :
+
+        createuser -P -s -e joe 
+
+            This user :
+                - requires a password 
+                - is superuser 
+                - echoes commands
+
+
+2.0 # LOG IN AS A NEW USER 
+
+    **You must add the user create in posgresql 
+    to you system and the passwords must match
+
+    sudo adduser user_name
+    sudo -u user_name psql
+
+    **By defefault posgresql assumes the database name and the user 
+    name are the same. 
+
+    **If you want to connect the a different database use :
+
+    sudo -u user_name psql -d database_name
+
+3.0 # BASIC COMMANDS 
+
+    \l : show databases 
+
+    DROP DATABASE IF EXISTS database_name : deletes a database 
+
+    \dt : show tables
+
+    DROP TABLE IF EXISTS table_name : deletes a table
+
+    \q : exits psql console 
+
+    exit : exits  posgresql user role.
