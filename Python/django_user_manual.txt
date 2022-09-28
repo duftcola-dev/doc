@@ -880,3 +880,292 @@ INDEX
 
 
 10 # INSTALLING POSTGRESQL IN DJANGO
+
+    ** Install posgresql in your system or in container 
+    ** Create an user 
+    ** Create a database 
+    
+    Change you djago configuration file to access posgresql 
+
+    DATABASES = {
+    'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'database_name',
+            'USER': 'user_name',
+            'PASSWORD': 'your_password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
+
+
+-------------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------------
+
+11 # DJANGO CACHE 
+
+    11.1 # INSTALLATION
+        **In order to create user sessions we must first enable a place 
+        to store our session data . We have tow options :
+
+            - storage in cache 
+            - strage in a database 
+
+        For storage in cache install: 
+
+            pip install pymemcache
+
+    11.2 # ADD CACHE LIB TO DJANGO 
+
+        CACHES = {
+            'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': '127.0.0.1:8000',
+            }
+        }
+
+        ** You can have many memcahche instances 
+        ** One excellent feature of Memcached is its ability to 
+           share a cache over multiple servers. This means you can 
+           run Memcached daemons on multiple machines, and the program will 
+           treat the group of machines as a single cache.
+        
+        CACHES = {
+            'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': [
+                '172.19.26.240:11211',
+                '172.19.26.242:11212',
+                '172.19.26.244:11213',
+                ]
+            }
+        }
+
+        ** meme cache can accept a few options  to alter its behavior 
+
+        CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'no_delay': True,
+                'ignore_exc': True,
+                'max_pool_size': 4,
+                'use_pooling': True,
+                }
+            }
+        }
+        
+
+        **You can specify other chache instances and tag them :
+
+        CACHES = {
+            'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': [
+                '172.19.26.240:11211',
+                '172.19.26.242:11212',
+                '172.19.26.244:11213',
+                ]
+            },
+            'special_chache': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+            'LOCATION': [
+                '0.0.0.0:10000',
+                ]
+            }
+        }
+
+        11.2.1 # USING FILE CACHE INSTEAD 
+
+            **storing chace in a file instead of a server instance:
+
+            CACHES = {
+                'default': {
+                    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+                    'LOCATION': '/var/tmp/django_cache',
+                }
+            }
+        
+        11.2.2 # USING LOCAL MEMORY INSTEAD 
+
+            ** Storing cache ins sytem memory  instead.
+            ** LOCATION in this case is just a tag for the memory area used.
+            ** You can create and tag many areas for different caches .
+            ** This system is very fast but chache will be deleted if the server crashes
+
+            CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'unique-snowflake',
+            }
+        }
+
+
+    11.3 # USING THE CACHE LIB IN VIEWS
+
+        **This will cache the response of the 
+        view for 15 minutes
+    
+        from django.views.decorators.cache import cache_page
+
+        @cache_page(60 * 15)
+        def my_view(request):
+
+    11.4 # SELECTING AN SPECIFIC CACHE 
+
+        from django.views.decorators.cache import cache_page
+        @cache_page(60 * 15,cache="special_cache")
+        def my_view(request):
+
+    11.5 # SPECIFYING CACHE IN URLS 
+
+        from django.views.decorators.cache import cache_page
+
+        urlpatterns = [
+            path('foo/<int:code>/', cache_page(60 * 15)(my_view)),
+        ]
+
+
+    11.6 CACHE TEMPLATE FRAGMENTS 
+
+        {% load cache %}
+        {% cache 500 sidebar %}
+            .. sidebar ..
+        {% endcache %}
+
+        ** This template will be displayed and stored in cache for 500 seconds
+
+    
+    11.7 # BASIC CAchE USAGE 
+
+        from django.core.cache import cache
+
+        sintaxis:
+
+            cache.set('key','value',timeout)
+        
+        **to add a key ONLY 
+
+        example:
+
+            cache.set('my_key', 'hello, world!', 30)
+
+        **getting values :
+
+            cache.get('key')
+
+            or
+
+            cache['key']
+
+
+12 #  DJANGO SESSION 
+
+    12.1 #  CREATING sessions
+
+        **In order to create session you first need to configure 
+        a CACHE engine. Check the previous point for more details. 
+
+        **If a cache engine have been created then we can proceed to create a 
+        session engine in settings.py or dev.py 
+
+        SESSION_ENGINE="django.contrib.sessions.backends.cache"
+
+        **login
+
+        def login(request):
+            m = Member.objects.get(username=request.POST['username'])
+            if m.check_password(request.POST['password']):
+                request.session['member_id'] = m.id
+                return HttpResponse("You're logged in.")
+            else:
+                return HttpResponse("Your username and password didn't match.")
+
+        **logout
+
+        def logout(request):
+            try:
+                del request.session['member_id']
+            except KeyError:
+                pass
+            return HttpResponse("You're logged out.")
+
+    
+    12.2 # CLEARING SESSION DATA 
+
+        **Session data tends to accumulate.
+        **It is important to delete this data regularly .
+
+        ** Use the command :
+
+            django-admin clearsessions 
+
+        ** ... in order to purge session data.
+
+        It is possible to make this type of tasks with a CRON JOB 
+
+
+13.0 # CRON JOBS 
+
+    13.1 # CONCEPT
+        ** cron jobs are tasks triggered automatically at certain schedule or time like
+        for instance deleting session data.
+
+    13.2 # INSTALLATION 
+
+        pip install django-crontab
+
+        **in settings.py or base.py
+
+        INSTALLED_APPS = [
+            'django_crontab',
+            ...
+        ]
+
+        **define your cron tasks 
+        **This is a task run every five minutes
+        ** each '*' represents a time unit
+
+        1- Minute (0 – 59)
+        2- Hour (0 – 23)
+        3- Day of the month(1 – 31)
+        4- Month (1 – 12)
+        5- Week day (0 – 6)
+
+        CRONJOBS = [
+            ('*/5 * * * *', 'applications.myapp.cron.my_scheduled_job')
+        ]
+
+        **define arguments for your cron tasks.
+        CRONJOBS = [
+            ('*/5 * * * *', 'applications.myapp.cron.my_scheduled_job', ['arg1', 'arg2'], {'verbose': 0}),
+        ]
+
+    13.3 # APPLICATIONS
+
+        **In your application at 
+
+        applications/
+                    myapp/
+                        cron.py 
+
+        **define the task 
+
+        def my_scheduled_job(*args,**kwargs):
+            pass
+
+    13.4 # ENABLE THE CRONT JOBS 
+
+        python manage.py crontab add
+
+    13.4 # SHOW CRON JOBS RUNNING 
+
+        python manage.py crontab show
+
+    13.5 # DISABLE CRON JOBS 
+
+        python manage.py crontab remove
