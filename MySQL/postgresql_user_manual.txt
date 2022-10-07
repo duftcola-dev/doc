@@ -112,4 +112,8 @@
 
     \q : exits psql console 
 
+    \du : show a list of users
+
     exit : exits  posgresql user role.
+
+    

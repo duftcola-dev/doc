@@ -1,6 +1,16 @@
 ## NODE JS USER MANUAL
 
-# Download node js 
+
+0.0 # NODE REF MANUAL
+
+    https://nodejs.org/docs/latest-v17.x/api/
+
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+
+1.0 # NODE JS INSTALLATION
 
     ** Linux Ubuntu uninstall current node js 
         sudo apt-get purge --auto-remove nodejs
@@ -15,7 +25,12 @@
         sudo node --version
         curl -fsSL https://deb.nodesource.com/test | bash -
 
-# Nvm 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+
+2.0 # INSTALLING SPEVIFIC NODE VERSION Nvm 
 
     - Nvm is a nodejs version manager in case you need to deal with 
       code made in older versions o node js.
@@ -49,8 +64,12 @@
 
         rm -rf "$NVM_DIR"
 
+----------------------------------------------------------------------------------------------------------
 
-# Creating a project  / managin deppendencies 
+
+----------------------------------------------------------------------------------------------------------
+
+3.0 # CREATE NODE PROJECT 
 
     **initialize and create a project
 
@@ -60,44 +79,56 @@
 
         npm init myapp ./app
 
+        or 
+
+        npm init
+
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------
+
+4.0 # INSTALL DEPPENDENCIES 
+
     **npm manages downloads of dependencies of your project.
 
-    npm install 
+        npm install 
 
     **install a single package 
 
-    npm install pacakge_name 
-
-    -- save-dev : installs and adds the entry to the package.json file devDependencies
-    -- no-save : installs but does not add the entry to the package.json file dependencies
-    -- save-optional : installs and adds the entry to the package.json file optionalDependencies
-    -- no-optional : will prevent optional dependencies from being installed
+        npm install pacakge_name 
+        
+        options :
+        -- save-dev : installs and adds the entry to the package.json file devDependencies
+        -- no-save : installs but does not add the entry to the package.json file dependencies
+        -- save-optional : installs and adds the entry to the package.json file optionalDependencies
+        -- no-optional : will prevent optional dependencies from being installed
 
     **update pacakages
 
-    npm update
+        npm update
 
     **update specific pacakage
 
-    npm update <package-name>
+        npm update <package-name>
 
     
     **run scripts / tasks 
 
-    npm run <task-name>
+        npm run <task-name>
 
-    //in package json 
+        //in package json 
 
-        {
-        "scripts": {
-            "start-dev": "node lib/server-development",
-            "start": "node lib/server-production"
+            {
+            "scripts": {
+                "start-dev": "node lib/server-development",
+                "start": "node lib/server-production"
+            }
         }
-    }
 
     ** the package.json is a manifest with metainformation of your project
     ** the package-lock.json is a file is to keep track of the exact version of 
-    every package that is
+        every package that is
 
     **show the version of the current packages 
     npm list 
@@ -106,33 +137,110 @@
 
     npm uninstall -g <package-name>
 
-
-# Launch node app 
-
-    **app.js being the index file of your project
-    node app.js 
-
-    **Add to you index file a shebang 
-
-        #!/usr/bin/env node
-        // your code
-
-    **Add permisions 
-
-        chmod u+x app.js
+----------------------------------------------------------------------------------------------------------
 
 
-# Enable app auto restart 
+----------------------------------------------------------------------------------------------------------
 
-    npm i -g nodemon 
+5.0 # CREATE NODEJS CONFIGURATION  
+
+    5.0 # INSTALL CONFIG LIBRARY
+
+        npm install config
     
-    **or
+    5.1 #  CREATE PROJECT LAYOUT
 
-    npm i --save-dev nodemon
+        **Create the following structure 
 
-# Run your application with autorestart (for development only) 
+        settings/
+            default.json
+            dev.json 
+            prod.json 
+            test.json
+        
+        **The content of default.json  :
 
-    nodemon app.js
+        {   
+            "server":{
+                "host":"localhost",
+                "port":8000,
+                "secret":""
+            },
+        }
+
+        **Default will be your basic configuration files. 
+        **The other files extend from default.json
+    
+    5.2 # LOAD DEFAULT CONFIGURATION
+
+        **The loaded configuration file deppends of the value of the environment variable NODE_ENV
+
+            if export NODE_ENV=prod this will load prod.json 
+            if export NODE_ENV=dev this  will load dev.json etc
+
+        **If no value is used the it will load default.json
+        **The name of the folder and the files is relevant
+
+    5.3 # USE THE CONFIG DATA
+
+        const config = require('config'); 
+
+        const port = config.get('server.port');
+        const host = config.get('server.host');
+
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+
+6.0 # PREPARE THE NODE APP TO LAUCH 
+
+    6.1 # APPLICATION SETUP
+
+        **There are 2 recommended pacakges for nodejs 
+
+            - express : Makes the task of settup backend app more agile.
+
+                npm install express 
+
+            - nodemond : Allows automatic reload of your node server. (usefull for development)
+
+        **Add to you index file a shebang 
+
+            #!/usr/bin/env node
+            // your code
+
+        **Add permisions (OPTIONAL)
+
+            chmod u+x index.js.js
+
+        **If you create your project using npm init the entry point of your app is index.js 
+        **To run your app use:
+            
+            node index
+
+        **If you have installed nodemon enable autorestart by running with:
+        # Enable app auto restart
+
+            npm i -g nodemon 
+    
+            or
+
+            npm i --save-dev nodemon
+   
+        # Run your application with autorestart (for development only) 
+
+            export NODE_ENV=dev
+            nodemon app.js
+    
+
+
+ 
+
+    
+
+
 
 
 # Start basic http server 

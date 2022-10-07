@@ -45,6 +45,38 @@ INDEX
     9.1 # ONE TO ONE RELATION
     9.2 # MANY TO ONE RELATIONS 
     9.3 # MANY TO MANY RELATIONS 
+10 # INSTALLING POSTGRESQL IN DJANGO
+11 # DJANGO CACHE 
+    11.1 # INSTALLATION
+    11.2 # ADD CACHE LIB TO DJANGO 
+        11.2.1 # USING FILE CACHE INSTEAD 
+        11.2.2 # USING LOCAL MEMORY INSTEAD 
+    11.3 # USING THE CACHE LIB IN VIEWS
+    11.4 # SELECTING AN SPECIFIC CACHE 
+    11.5 # SPECIFYING CACHE IN URLS 
+    11.7 # BASIC CACHE USAGE 
+12 #  DJANGO SESSION 
+    12.1 #  CREATING sessions
+    12.2 # CLEARING SESSION DATA 
+13.0 # CRON JOBS 
+    13.1 # CONCEPT
+    13.2 # INSTALLATION 
+    13.3 # APPLICATIONS
+    13.4 # ENABLE THE CRONT JOBS 
+    13.4 # SHOW CRON JOBS RUNNING 
+    13.5 # DISABLE CRON JOBS 
+14.0 # THE DJANGO ADMIN
+            # Register your models here.
+    14.1 # CLASS META 
+    14.2 # DISPLAY ADDITIONAL INFO IN THE ADMIN BOARD 
+    14.3 # ADMIN SEARCH FIELDS  
+    14.4 # ADMIN FILTERS   
+                # We want to display this fields as a list
+                # We wish to be able to search by this field
+                # We want to be able to filter by these fields 
+    14.5 # ADMIN FUNCTIONS 
+
+
 
 
 1.0 # DJANGO INSTALLATION 
@@ -923,10 +955,11 @@ INDEX
         CACHES = {
             'default': {
             'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': '127.0.0.1:8000',
+            'LOCATION': '127.0.0.1:11211',
             }
         }
 
+        ** Do no use 127.0.0.1:8000 since that is django default url:port
         ** You can have many memcahche instances 
         ** One excellent feature of Memcached is its ability to 
            share a cache over multiple servers. This means you can 
@@ -1040,7 +1073,7 @@ INDEX
         ** This template will be displayed and stored in cache for 500 seconds
 
     
-    11.7 # BASIC CAchE USAGE 
+    11.7 # BASIC CACHE USAGE 
 
         from django.core.cache import cache
 
@@ -1061,6 +1094,11 @@ INDEX
             or
 
             cache['key']
+
+----------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------
 
 
 12 #  DJANGO SESSION 
@@ -1108,6 +1146,10 @@ INDEX
 
         It is possible to make this type of tasks with a CRON JOB 
 
+----------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------
 
 13.0 # CRON JOBS 
 
@@ -1169,3 +1211,182 @@ INDEX
     13.5 # DISABLE CRON JOBS 
 
         python manage.py crontab remove
+
+----------------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------------
+
+14.0 # THE DJANGO ADMIN
+
+    **In order to siplay the models create in the admin board they must be registered at myapp/admin.py :
+
+
+        sintaxis:
+
+            admin.site.register(mode_class)
+
+        example:
+            from django.contrib import admin
+            from .models import *
+
+            # Register your models here.
+            
+            admin.site.register(Host)
+            admin.site.register(HostHistory)
+            admin.site.register(Reservations)
+            admin.site.register(Rooms)
+
+    14.1 # CLASS META 
+
+    **The django admin is a very versatile tool 
+    for the end client.
+
+    **The class Meta allows us to add functionalities to
+    our models that can be used by the django admin 
+
+    sintaxis:
+
+        - verbose_name : Custom tag for yu model in the admin board
+        - verbose_name_plural: Custom tag for plural names
+        - ordering: Order by in the admin board
+        - unique_together: Prevents to register in the model table 
+                            the same attribute or a combination 
+                            of attributes twice
+
+    example:
+
+        class SomeModel(models.Model):
+
+            attrib_a
+            attrib_b
+            attrib_c
+
+            class Meta:
+                verbose_name="My Model" 
+                verbose_name_plural="My Models" 
+                ordering=["attrib_a"]
+                unique_together=("attrib_a","attrib_b","attrib_c")
+            
+            def __str__(self)->str:
+
+                return f"{self.attrib_a} - {self.attrib_b}" 
+
+    14.2 # DISPLAY ADDITIONAL INFO IN THE ADMIN BOARD 
+
+        **So far the damin board only diplays the information returned by  :
+
+            def __str__(self)->str:
+
+                return f"{self.attrib_a} - {self.attrib_b}" 
+
+        **I order to show additional information we must configure that in myapp/admin.py
+
+        exmaple :
+
+            from django.contrib import admin
+            from .models import *
+
+            class EmpleadoAdminDisplay(Empleado)
+
+                display_list=(
+                    "first_name",
+                    "last_name",
+                    "job"
+                )
+
+            **Add the new display class to the admin register
+            admin.register(Reservations,EmpleadoAdminDisplay)
+    
+    14.3 # ADMIN SEARCH FIELDS  
+
+            **create filters and a search bar in the admin board 
+
+            sintaxis:
+
+                search_fields=(
+                    "field_name",
+                    "field_name",
+                    .
+                    .
+                    .
+                )
+
+            
+            **in admin.py
+            example:
+
+            from django.contrib import admin
+            from .models import *
+
+            class EmpleadoAdminDisplay(Empleado)
+
+                display_list=(
+                    "first_name",
+                    "last_name",
+                    "job"
+                )
+
+                search_fields=(
+                    "first_name",
+                    "last_name",
+                    "job",
+                )
+            
+    14.4 # ADMIN FILTERS   
+
+            example:
+
+                class HostDisplay(Host):
+                # We want to display this fields as a list
+                display_list=(
+                    "host_name",
+                    "host_surname",
+                    "host_document_id",
+                    "email",
+                )
+                # We wish to be able to search by this field
+                search_fields=(
+                    "host_document_id"
+                )
+                # We want to be able to filter by these fields 
+                list_filter=(
+                    "host_name",
+                    "host_document_id",
+                    "email"
+                )
+            
+            ** Use :
+
+                filter_horizontal=(
+                "host",
+                "room",
+                ) 
+
+            ... for many to many relations fields
+            
+    14.5 # ADMIN FUNCTIONS 
+
+        ** Imagein we want to create a custom fields
+        with our own values and display it in the admin board.
+        We can achieve that 
+
+        display_list=(
+                "host_name",
+                "host_surname",
+                "host_document_id",
+                "email",
+                "full_name",
+            )
+        
+        example :
+
+        **obj is every object of this model
+
+            def full_name(self,obj):
+                name = obj.host_name
+                surname = obj.host_surname
+                return name + " - "+  surname
+        
+        ** Now the field 'full_name' contain the result 
+        of the function full_name
