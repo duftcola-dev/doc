@@ -1,3 +1,60 @@
+INDEX
+
+## NODE JS USER MANUAL
+0.0 # NODE REF MANUAL
+1.0 # NODE JS INSTALLATION
+2.0 # INSTALLING SPECIFIC NODE VERSION Nvm 
+3.0 # CREATE NODE PROJECT 
+4.0 # INSTALL DEPPENDENCIES 
+5.0 # CREATE NODEJS CONFIGURATION  
+    5.0 # INSTALL CONFIG LIBRARY
+    5.1 #  CREATE PROJECT LAYOUT
+    5.2 # LOAD DEFAULT CONFIGURATION
+    5.3 # USE THE CONFIG DATA
+6.0 # USING .ENV FILES
+    6.1 # BASIC USE OF DOTENV
+    6.2 # STORING .ENV FIELS IN A FOLDER 
+7.0 # PREPARE THE NODE APP TO LAUCH 
+    7.1 # APPLICATION SETUP
+            #!/usr/bin/env node
+    7.2 # Enable app auto restart
+    7.3 # Run your application with autorestart (for development only) 
+8.0 # SCRIPTS 
+9.0 # NODE IMPORT SYSTEM
+    9.1 # ES IMPORT SYSTEM :
+    9.2 # NODEJS IMPORT SYSTEM :
+10.0 # BASIC HTTP SERVER (WITH EXPRESS)
+    10.1 # METHODS 
+    10.2 # THE REQUEST OBJECT 
+        https://expressjs.com/en/api.html#req
+    10.3 # THE RESPONSE OBJECT
+        https://expressjs.com/en/api.html#res.app
+    10.4 # ROUTER 
+11.0 # SENDING HTTP REQUEST
+    11.1 # SENDING HTTP WITH AJAX
+    11.2 # USING HTTP 
+    11.3 # USING HTTPS 
+    11.4 # WITH OPTIONS
+12.0 # READING FILES 
+    12.1 # BASIC USE
+    12.3 # READING FILE ASYNC
+    12.3 # USING FILE DESCRIPTOR (ASYNC)
+    12.4 #  WRITTING FILE (ASYNC)
+    12.5 # APPEND TO FILE 
+13.0 # PROMISES/ASYNC AWAIT
+    13.1 # PROMISES
+    13.2 # MODERN ASYCN AWAIT 
+14.0 # EVENT EMITERS
+15.0 # NODE JS BUFFERS 
+16.0 # NODE STREAMS 
+17.0 # CREATE A READABLE STREAMS
+18.0 # READABLE AND WRITETABLE STREAM 
+19.0 # CLASSES
+    **private methods use #
+        #private_class_method(){
+20.0 # SCHEMA VALIDATION
+
+
 ## NODE JS USER MANUAL
 
 
@@ -30,7 +87,7 @@
 
 ----------------------------------------------------------------------------------------------------------
 
-2.0 # INSTALLING SPEVIFIC NODE VERSION Nvm 
+2.0 # INSTALLING SPECIFIC NODE VERSION Nvm 
 
     - Nvm is a nodejs version manager in case you need to deal with 
       code made in older versions o node js.
@@ -99,10 +156,19 @@
         npm install pacakge_name 
         
         options :
-        -- save-dev : installs and adds the entry to the package.json file devDependencies
-        -- no-save : installs but does not add the entry to the package.json file dependencies
-        -- save-optional : installs and adds the entry to the package.json file optionalDependencies
-        -- no-optional : will prevent optional dependencies from being installed
+        --save : The packages will appear in your deppendencies
+        --save-dev : installs and adds the entry to the package.json file devDependencies
+        --no-save : installs but does not add the entry to the package.json file dependencies
+        --save-optional : installs and adds the entry to the package.json file optionalDependencies
+        --no-optional : will prevent optional dependencies from being installed
+    
+        sintaxis:
+
+            npm instal package_name <option> 
+
+        example:
+
+            npm install config --save
 
     **update pacakages
 
@@ -193,10 +259,54 @@
 
 ----------------------------------------------------------------------------------------------------------  
 
+6.0 # USING .ENV FILES
 
-6.0 # PREPARE THE NODE APP TO LAUCH 
+    6.1 # BASIC USE OF DOTENV
 
-    6.1 # APPLICATION SETUP
+        **install the dotenv  pacakage
+
+            npm install dotenv --save
+        
+        **create a .env file 
+
+            USER_ID="239482"
+            USER_KEY="foobar"
+            NODE_ENV="development"
+
+        ** load the environment variables.
+        example :
+        
+        **in your server sart file index.js 
+        **now the variables in you .env files are present in your environment 
+
+
+            require('dotenv').config();
+
+            process.env.USER_ID; // "239482"
+            process.env.USER_KEY; // "foobar"
+            process.env.NODE_ENV; // "development"
+
+    6.2 # STORING .ENV FIELS IN A FOLDER 
+
+        **use the path option
+
+            require('dotenv').config({ path: '/custom/path/to/.env' })
+
+        **use the global model.filename to get the path of the current file
+
+
+            const ROOT_DIR = module.filename
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+
+7.0 # PREPARE THE NODE APP TO LAUCH 
+
+    7.1 # APPLICATION SETUP
 
         **There are 2 recommended pacakges for nodejs 
 
@@ -220,8 +330,7 @@
             
             node index
 
-        **If you have installed nodemon enable autorestart by running with:
-        # Enable app auto restart
+    7.2 # Enable app auto restart
 
             npm i -g nodemon 
     
@@ -229,444 +338,626 @@
 
             npm i --save-dev nodemon
    
-        # Run your application with autorestart (for development only) 
+    7.3 # Run your application with autorestart (for development only) 
 
             export NODE_ENV=dev
-            nodemon app.js
+            nodemon index.js
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+8.0 # SCRIPTS 
+
+    **When a nodejs project is created several files are created :
+
+    - pakage-lock-json : Loags deppednecies to an specific version.
+    - package.json : Record the versions of the installed deppendencies 
+                     When running a npm install the deppendencies installed
+                     will be those in the package.json
+
+                     The pacakge.json also supports adding cli scripts 
+                     to your project.
+                     The scripts field in package.json can contain paths to
+                     .js files or console scripts in bash
     
+    sintaxis:
+
+        npm run-script script_name
+
+        or 
+
+        npm run script_name
 
 
- 
+    Example of scripts:
 
+        {
+        "name": "node_cv",
+        "version": "1.0.0",
+        "description": "node js cv ",
+        "main": "index.js",
+        "scripts": {
+            "test": "scripts/test.js",
+            "install":"scripts/install.js",
+            "docker":"docker build -t dufctola/my_docker_image ."
+        },...
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+   
+9.0 # NODE IMPORT SYSTEM
     
+    **Nodejs supports two systems to import files and packages:
+
+        - nodejs original import system.
+            **This is the original system created by nodejs 
+            and 
+        - ecma-script estandard system or ES.
+            **we do not use it
+
+    9.1 # ES IMPORT SYSTEM :
+
+        - modules use the .mjs notation 
+        - main files use .js notation
+
+        //addTwo.mjs 
+
+            function AddTwo(number){
+                return number+2;
+            }
+
+            export {
+                AddTwo
+            };
+
+        //index.js 
+
+            import {AddTwo} from './utils/addTwo.mjs';
+
+            console.log(AddTwo(2));
 
 
+        **Using {AddTwo} import the function or object itself 
+        **Not using {} wraps the import object/function around a object
+        **You can use namespaces : import {AddTwo as add} from './utils/addTwo.mjs';
+
+    9.2 # NODEJS IMPORT SYSTEM :
+
+        //car.js 
+            const car = {
+                brand: 'Ford',
+                model: 'Fiesta',
+            };
+            
+            const car2={
+                brand: 'Ford',
+                model: 'Fiesta',
+            };
+
+            module.exports = {
+                car;
+                car2;
+            }
+
+        //index.js
+            const {car,car2} = require('./car');
+    
+----------------------------------------------------------------------------------------------------------
 
 
-# Start basic http server 
+----------------------------------------------------------------------------------------------------------  
+
+10.0 # BASIC HTTP SERVER (WITH EXPRESS)
 
     const express = require('express');
     const app = express();
 
-    app.get('/', (req, res) => {
-    res.send('Hi!');
+    app.get('/', function(req, res) => {
+        res.send('Hi!');
     });
 
-    app.listen(3000, () => console.log('Server ready'));
+    app.listen(3000,'127.0.0.1', () => console.log('Server ready'));
 
 
     ***Express is a framework that uses the http 
     module under the hood, app.listen() returns 
     an instance of http***
 
+    10.1 # METHODS 
 
-# How to stop a node server (programatically).
+        app.get("/",function(req,res){
 
-    **Usually when node runs in the console it can be stoped 
-    by ctrl + c but if it run in a remote system we must have a way to stop 
-    it programatically...
+        })
 
-    ...for that we have signals.
+        app.post("/",function(req,res){
 
-    ***Signals are a POSIX intercommunication system: 
-    a notification sent to a process in order to notify 
-    it of an event that occurred.
+        })
 
-        const express = require('express');
-        const app = express();
+        app.put("/",function(req,res){
+            
+        })
 
-        app.get('/', (req, res) => {
-        res.send('Hi!');
-        });
-        const server = app.listen(3000, () => console.log('Server ready'));
-
-        process.on('SIGTERM', () => {
-        server.close(() => {
-            console.log('Process terminated');
-        });
-        });
-
-    We have to options :
-        - SIGKILL : SIGKILL is the signal that tells a process to 
-        immediately terminate, and would ideally act like process.exit().
-
-        - SIGTERM : SIGTERM is the signal that tells a process to gracefully 
-        terminate. It is the signal that's sent from process managers like upstart 
-        or supervisord and many others.
-
-    You can send this signal from inside the program, in another function:
+        app.delete("/",function(req,res){
+            
+        })
         
-        process.kill(process.pid, 'SIGTERM');
 
-        Or from another Node.js running program, or any other app running 
-        in your system that knows the PID of the process you want to 
-        terminate.
+        **All methods allowed
+        app.all("/",function(req,res){
+            
+        })
+
+        ** Route handler
+
+        app.route("/home")
+            .get(function(req,res){
+                res.send("Home_page");
+            })
+            .post(function(req,res){
+
+            });
 
 
-# Reading Environment variables 
+    10.2 # THE REQUEST OBJECT 
+        https://expressjs.com/en/api.html#req
 
-    **install the dotenv  pacakage
+        app.get("/",function(req,res){
 
-        npm install dotenv --save
+        })
+
+        **properties of req:
+
+            req.headers : js object
+            req.headersDictinct : string[]
+            req.methods: string
+            req.rawHeaders: string[]
+            req.statusCode : number
+            req.statusMessage: string
+            req.url: string 
+
+        **If express.use(json) is enabled then 
+        in order to receibe json data you only have to access the body :
+
+            req.body.json_data
+
+    10.3 # THE RESPONSE OBJECT
+
+        https://expressjs.com/en/api.html#res.app
+
+        ** basic response
+            app.get("/",function(req,res){
+                res.send("OK");
+            })
+
+        ** res.status
+            app.get("/",function(req,res){
+                res.status(200);
+                res.send("OK");
+            })
+
+        ** render template
+
+            sintaxis:
+                res.render(view,local,callback)
+            
+            example:
+                res.render("index")
+
+        ** use the res.locals propeties to define 
+           variables used by templates
+
+            res.locals.users ="Robin";
+            res.locals.data = "some data";
+            res.render("some_view");
+
+        ** use res.append to add values to the http response headers 
+
+            sintaxis:
+                res.append("field","value");
+
+            example:
+
+                res.append("Link","some_link/link");
+                res.append("warning","user invalid");
+
+        ** download resources
+
+            res.download("/path_/to_/file.pdf");
+        
+        ** res.end 
+
+            **ends the response quickly without any data 
+            res.end();
+
+            or 
+
+            res.status(404).end();
+
+        ** res.json 
+
+            js_object={user:"Robin"};
+            res.json(js_object);
+            res.send();
+
+    10.4 # ROUTER 
+
+        **Express router 
+        **The class express router allows you to create 
+          modular route handlers 
+
+        const express = require("express");
+        const router = express.Router();
+
+        ** Create a middleware for the router 
+        
+        //homes.js
+            router.use(function(req,res,next){
+                console.log("Time : ",Date.now());
+                next();
+            });
+
+            router.get("/home",function(req,res){
+                res.send("home_page");
+            });
+
+            module.export={
+                router
+            };
+
+        //index.js  
+
+            const {homes_router}=require("./homes.js")
+            app.use("/homes",homes_router)
+
+            **notice "/homes" will be the prefix for all the rutes in
+            the router therefore "/homes/home"
     
-    **create your .env file 
-    **fill the file
-
-    example : 
-
-    ** .env file
-
-    USER_ID="239482"
-    USER_KEY="foobar"
-    NODE_ENV="development"
-
-    **in your server sart file app.js 
-
-    require('dotenv').config();
-    process.env.USER_ID; // "239482"
-    process.env.USER_KEY; // "foobar"
-    process.env.NODE_ENV; // "development"
+----------------------------------------------------------------------------------------------------------
 
 
-# Nodejs import/export system 
+----------------------------------------------------------------------------------------------------------  
 
+11.0 # SENDING HTTP REQUEST
 
-    **importing node modules
-    **to import the functionality exposed in the car.js file that 
-    resides in the current file folder.
+    11.1 # SENDING HTTP WITH AJAX
 
-    //index.js
-    const {car} = require('./car');
-    
-
-    //car.js 
-    const car = {
-    brand: 'Ford',
-    model: 'Fiesta',
-    };
-
-    module.exports = car;
-
-
-    **If you have seleveral items in a module you
-    can always add them to the exports 
-    as object 
-
-
-    //car.js 
-
-    const car = {
-    brand: 'Ford',
-    model: 'Fiesta',
-    };
-
-    const car2={
-    brand: 'Ford',
-    model: 'Fiesta',
-    }
-
-    exports.car=car
-    exports.car2=car2 
-
-    **or
-    module exports={
-        car:car,
-        car2:car2,
-    }
-
-    //index.js 
-
-    const {car} = require('./car');
-    const {car2} = require('./car');
-
-
-# JAVASCRITP TIMERS
- 
-    setTimeout(() => {
-    // runs after 2 seconds
-    }, 2000);
-
-    setTimeout(() => {
-    // runs after 50 milliseconds
-    }, 50);
-
-# READING FILES 
-
-    const fs = require('fs');
-
-    fs.readFile('/file.json', (err, data) => {
-    if (err) {
-        // handle error
-        console.log(err);
-        return;
-    }
-
-# SENDING HTTP REQUEST
-
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = () => {
-    if (xhr.readyState === 4) {
-        xhr.status === 200 ? console.log(xhr.responseText) : console.error('error');
-    }
-    };
-    xhr.open('GET', 'https://yoursite.com');
-    xhr.send();
-
-
-# Promises 
-
-    **A promise is commonly defined as a proxy for a value 
-    that will eventually become available.
-    **Once a promise has been called, it will start in a pending state.
-    **Every promise starts with a promise constructor 
-    **async / await uses primises in the back 
-
-    const p = new Promise((resolve, reject) => {
-        if some_condition{
-            resolver(done) //task finished
-        }else {
-            reject(wait) //pending task not finished
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+            xhr.status === 200 ? console.log(xhr.responseText) : console.error('error');
         }
-    });
+        };
+        xhr.open('GET', 'https://yoursite.com');
+        xhr.send();
 
-    example  reading a file :
+    11.2 # USING HTTP 
 
-        const getFile = fileName => {
-            return new Promise((resolve, reject) => {
-                    fs.readFile(fileName, (err, data) => {
-                        if (err) {
-                            reject(err); // calling `reject` will cause the promise to fail with or without the error passed as an argument
-                            return; // and we don't want to go any further
-                        }
-                    resolve(data);
+        const http = require("http");
+
+        const path="http://google.com";
+
+        http.get(path,function(res){
+
+            //A chunk of data have been received
+            res.on("data",function(data){
+                if (statu_code !=200){
+                error = new Error("Error description string");
+                }
+            }):
+
+            //The whole response have been received
+            res.on("end",function(res){
+                json_data=JSON.parse(json_data+data);
+            });
+
+            console.log(json_data);
+
+        //an error happened
+        }).on("error",function(e){
+
+        })
+
+    11.3 # USING HTTPS 
+
+       const https = require("https");
+
+        const path="http://google.com";
+
+        https.get(path,function(res){
+
+            //A chunk of data have been received
+            res.on("data",function(data){
+                if (statu_code !=200){
+                error = new Error("Error description string");
+                }
+            }):
+
+            //The whole response have been received
+            res.on("end",function(res){
+                json_data=JSON.parse(json_data+data);
+            });
+
+            console.log(json_data);
+            
+        //an error happened
+        }).on("error",function(e){
+
+        });
+
+    11.4 # WITH OPTIONS
+
+            ** full url = https://whatever.com/todos
+            const url="/todos";
+            const host_name = whatever.com;
+            const r_method="GET";
+            const port=443;
+
+            const https = require('https');
+
+            const options = {
+            hostname: host_name,
+            port: port,
+            path: url',
+            method: r_method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': data.length,
+                },
+            };
+
+            const req = https.request(options, function(res){
+                console.log(`statusCode: ${res.statusCode}`);
+
+                res.on('data', function(d) {
+                console.log(d);
                 });
-             });
+
+                let json_data='';
+                res.on('end',function(data){
+                    json_data=JSON.parse(json_data+data);
+                })
+                
+            }).on('error', function(error){
+                    console.error(error);
+            });
+    
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+
+12.0 # READING FILES 
+
+    12.1 # BASIC USE
+        const fs = require('fs');
+
+        fs.readFile('/file.json', (err, data) => {
+        if (err) {
+            // handle error
+            console.log(err);
+            return;
+        }
+
+    12.3 # READING FILE ASYNC
+
+        const fs = require('fs');
+        const util = require('util');
+
+        async function example() {
+            const open = util.promisify(fs.open);
+            const fd = await open('/Users/joe/test.txt', 'r');
+        }
+
+        example();
+
+
+    12.3 # USING FILE DESCRIPTOR (ASYNC)
+
+        const fs = require('fs/promises');
+        
+        **filehandle is a file descriptor that can interact withthe open file 
+
+        async function example() {
+            let filehandle;
+            try {
+
+                if fs.access('/Users/joe/test.txt',fs.F_OK,function(err){
+                    if (err){
+                        throw "MY_CUSTOM_EXCPTION";
+                    }
+                });
+
+                filehandle = await fs.open('/Users/joe/test.txt', 'r');
+                console.log(filehandle.fd);
+                content = await filehandle.readFile({ encoding: 'utf8' }));
+                console.log(content);
+
+            catch(err){
+                console.log(err);
+            } finally {
+                await filehandle.close();
+            }
+        }
+
+        example();
+
+    12.4 #  WRITTING FILE (ASYNC)
+
+        const fs = require('fs/promises');
+
+        async function example() {
+            try {
+                const content = 'Some content!';
+                await fs.writeFile('/Users/joe/test.txt', content);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        example();
+
+    12.5 # APPEND TO FILE 
+
+        const fs = require('fs/promises');
+
+        async function example() {
+            try {
+                const content = 'Some content!';
+                await fs.appendFile('/Users/joe/test.txt', content);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        example();
+
+    
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+13.0 # PROMISES/ASYNC AWAIT
+
+    13.1 # PROMISES
+
+        **A promise is commonly defined as a proxy for a value 
+        that will eventually become available.
+        **Once a promise has been called, it will start in a pending state.
+        **Every promise starts with a promise constructor 
+        **async / await uses primises in the back 
+
+        sintaxis:
+
+            const p = new Promise((resolve, reject) => {
+                if some_condition{
+                    resolver(done) //task finished
+                }else {
+                    reject(wait) //pending task not finished
+                }
+            });
+
+            return p;
+
+        example:  
+            
+            **reading a file 
+
+            function getFile(file_path){
+
+                return new Promise((resolve, reject) => {
+                        fs.readFile(file_path, (err, data) => {
+                            if (err) {
+                                reject(err); // calling `reject` will cause the promise to fail with or without the error passed as an argument
+                                return; // and we don't want to go any further
+                            }
+                        resolve(data);
+                    });
+                });
+            };
+
+
+            **calling the promise
+
+            getFile('/etc/passwd')
+            .then(data => console.log(data)) //then is used for the resolve case
+            .catch(err => console.error(err)); // catch for the reject case
+
+
+    13.2 # MODERN ASYCN AWAIT 
+
+        **promises have a lot of boiler plating and thats why async / await was introduced.
+
+        async function do_something(){
+            console.log("something");
+        }
+
+        result = await do_something()
+
+
+        **or 
+
+        const aFunction = async () => {
+            return 'test';
         };
 
+        const result = await aFunction(alert);
 
-    **function that launched the primise
+        **or 
 
-        getFile('/etc/passwd')
-        .then(data => console.log(data)) //then is used for the resolve case
-        .catch(err => console.error(err)); // catch for the reject case
+        await aFunction(alert)
 
+    13.3 CUNCURRENCY
 
-# MODERN ASYCN AWAIT 
-
-    **primses have a lot of bioler plating and thats why
-    async / await was introduced.
-
-    async function do_something(){
-
-    }
-
-    result = await do_something()
+        **We have several tasks we want to run aynchronously
 
 
-    **or 
+        example: This code will run on task after the other (not cuncurrency)
 
-    const aFunction = async () => {
-        return 'test';
-    };
+            const makeAsync = async () =>{
+                const a = await getName("name");
+                const b = await getDAta("data");
+                return [a,b]
+            }
 
-    aFunction().then(alert);
+        example: This is a fully cuncurrent async code 
 
-    **or 
-    await aFunction(alert)
+            const makeAsync = async () =>{
+                const a =  getName("name");
+                const b =  getDAta("data");
+                const tasks =  Promise.all([a,b]);
+                return tasks;
+            }
+
+            makeAsync().then(values);
 
 
-# EVENT  EMITER
+            ** The return values is an array with each value of each promise
+            **Use Promise.all([]) to run cuncurrent tasks.
+            **Notice the methods being run are not async/await
+
+    
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+
+14.0 # EVENT EMITERS
 
     **Allows to create/emit gloval events or signals
     accross the app that can be used to build logic 
 
     example : 
 
-    const EventEmitter = require('events');
-    const eventEmitter = new EventEmitter();
+        const EventEmitter = require('events');
+        const eventEmitter = new EventEmitter();
 
-    eventEmitter.emit('start'); // an emiter 
-    eventEmitter.emit('start', 1, 100); //multiple aguments emiter 
+        eventEmitter.emit('start'); // an emiter 
+        eventEmitter.emit('start', 1, 100); //multiple aguments emiter 
 
-    eventEmitter.on('start', () => { //an event receiver
-    console.log('started');
-    });
+        eventEmitter.on('start', () => { //an event receiver
+        console.log('started');
+        });
 
-    eventEmitter.on('start', (start, end) => { //multiple aguments receiver 
-    console.log(`started from ${start} to ${end}`);
-    });
-
-
--------------------------------------------------------
-
--------------------------------------------------------
+        eventEmitter.on('start', (start, end) => { //multiple aguments receiver 
+        console.log(`started from ${start} to ${end}`);
+        });
 
 
-# CREATE AND HTTP SERVER 
-
-
-    const express = require('express');
-    const app = express();
-    app.use(express.urlencoded({ //enable encoding
-        extended: true,
-        })
-    );
-    app.use(express.json()); //enable the use of json
-
-
-    app.get('/', (req, res) => {
-        res.send('Hi!');
-    });
-
-    app.post('/todos', (req, res) => {
-        console.log(req.body.some_json_data);
-    });
-
-    app.listen(3000, () => console.log('Server ready'));
-
-
-# SEND HTTP A GET REQUEST 
-
-    ** full url = https://whatever.com/todos
-    ** host name = whatever.com
-    ** path =/todos
-
-    const https = require('https');
-
-    const options = {
-    hostname: 'example.com',
-    port: 443,
-    path: '/todos',
-    method: 'GET',
-    };
-
-    const req = https.request(options, res => {
-    console.log(`statusCode: ${res.statusCode}`);
-
-    res.on('data', d => {
-        process.stdout.write(d);
-    });
-    });
-
-    req.on('error', error => {
-    console.error(error);
-    });
-
-    req.end();
-
-
-# SEND A POST / PUT /DELETE REQUEST 
-
-    const https = require('https');
-
-    const data = JSON.stringify({
-    todo: 'Buy the milk',
-    });
-
-    const options = {
-    hostname: 'whatever.com',
-    port: 443,
-    path: '/todos',
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': data.length,
-    },
-    };
-
-    const req = https.request(options, res => {
-    console.log(`statusCode: ${res.statusCode}`);
-
-    res.on('data', d => {
-        process.stdout.write(d);
-    });
-    });
-
-    req.on('error', error => {
-    console.error(error);
-    });
-
-    req.write(data);
-    req.end();
-
-
-# READING FILES 
-
-    const fs = require('fs/promises');
     
-    async function example() {
-        let filehandle;
-        try {
-            filehandle = await fs.open('/Users/joe/test.txt', 'r');
-            console.log(filehandle.fd);
-            console.log(await filehandle.readFile({ encoding: 'utf8' }));
-        } finally {
-            await filehandle.close();
-        }
-    }
-
-    example();
-
-    **filehandle is a file descriptor that can interact with
-    the open file 
+----------------------------------------------------------------------------------------------------------
 
 
-# READING FILE ASYNC 
+----------------------------------------------------------------------------------------------------------  
 
 
-    const fs = require('fs');
-    const util = require('util');
-
-    async function example() {
-    const open = util.promisify(fs.open);
-    const fd = await open('/Users/joe/test.txt', 'r');
-    }
-
-    example();
-
-
-# INTERATING WITH FILES 
-
-    const path = require('path');
-    const notes = '/users/joe/notes.txt';
-
-    path.dirname(notes); // /users/joe
-    path.basename(notes); // notes.txt
-    path.extname(notes); // .txt
-
-    const name = 'joe';
-    path.join('/', 'users', name, 'notes.txt'); // '/users/joe/notes.txt'
-
-# WRITE FILE 
-
-    const fs = require('fs/promises');
-
-    async function example() {
-    try {
-        const content = 'Some content!';
-        await fs.writeFile('/Users/joe/test.txt', content);
-    } catch (err) {
-        console.log(err);
-    }
-    }
-    example();
-
-# APPEND TO A FILE 
-
-    const fs = require('fs/promises');
-
-    async function example() {
-    try {
-        const content = 'Some content!';
-        await fs.appendFile('/Users/joe/test.txt', content);
-    } catch (err) {
-        console.log(err);
-    }
-    }
-    example();
-
-
-# NODE JS BUFFERS 
+15.0 # NODE JS BUFFERS 
 
     **Buffers in Node js are fix size array that deal with
     binary data , each item in a buffer array is 1 byte of data
@@ -706,7 +997,13 @@
         **faster and unsafer than alloc
 
 
-# NODE STREAMS 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+
+16.0 # NODE STREAMS 
 
     **Node streams allows us to transfer data 
     by chunks instead of all in one go.
@@ -756,8 +1053,13 @@
     Transform: a Duplex stream which reads data, transforms the data, 
                 and then writes the transformed data in the desired format.
 
+----------------------------------------------------------------------------------------------------------
 
-# CREATE A READABLE STREAMS
+
+----------------------------------------------------------------------------------------------------------  
+
+
+17.0 # CREATE A READABLE STREAMS
 
     **The name is confusing because a readable steam used
     to send information.
@@ -779,7 +1081,13 @@
 
     readableStream.pipe();
 
-# READABLE AND WRITETABLE STREAM 
+----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------------  
+
+
+18.0 # READABLE AND WRITETABLE STREAM 
 
     **writetable streams are used to receive information
 
@@ -806,36 +1114,47 @@
     writableStream.on('close', () => console.log('ended'));
     readableStream.destroy();
 
+----------------------------------------------------------------------------------------------------------
 
-# CLASSES (JS ECMA6)
 
-class  class_name {
-    constructor (args){
-        this.arg=arg 
+----------------------------------------------------------------------------------------------------------  
+
+
+19.0 # CLASSES
+
+    class  class_name {
+        constructor (args){
+            this.arg=arg 
+        }
     }
-}
 
+    const name=new class_name("robin");
 
     **class inheritance 
+    **private methods use #
 
-class  class_name extends parent_class {
-    constructor (parent_arg,arg){
-        super(parent_arg);
-        this.arg=arg;
+    class  class_name extends parent_class {
+        constructor (parent_arg,arg){
+            super(parent_arg);
+            this.arg=arg;
+        }
+
+        a_method(){
+
+        }
+
+        #private_class_method(){
+
+        }
     }
 
-    class_method(){
+----------------------------------------------------------------------------------------------------------
 
-    }
 
-    #private_class_method(){
+----------------------------------------------------------------------------------------------------------  
 
-    }
-}
 
-** private methods use #
-
-# SCHEMA VALIDATION
+20.0 # SCHEMA VALIDATION
 
     **there are several schema validation 
     libraries for requests for nodejs 
@@ -848,25 +1167,3 @@ class  class_name extends parent_class {
 
     doc about express validator here https://express-validator.github.io/docs/
 
-
-# CUNCURRENCY TASKS JAVASCRITP
-
-    example : We have several tasks we want to run aynchronously
-
-        **This code will run on task after the other (not cuncurrency)
-        const makeAsync = async () =>{
-            const a = await getName("name");
-            const b = await getDAta("data");
-            return [a,b]
-        }
-
-
-        **This is a fully cuncurrent async code 
-        const makeAsync = async () =>{
-            const a =  getName("name");
-            const b =  getDAta("data");
-            const tasks =  Promise.all([a,b]);
-            return tasks;
-        }
-
-        makeAsync().then(log);
