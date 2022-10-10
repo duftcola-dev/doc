@@ -1,10 +1,9 @@
-from calendar import c
+import sys
 from typing import Tuple,List
 
 def get_path()->str:
-    print("Relative path to file : ")
-    path = input()
-    return path
+    path = sys.argv
+    return path[1]
 
 
 def get_file_lines(path:str)->List[str]:

@@ -53,6 +53,8 @@ INDEX
     **private methods use #
         #private_class_method(){
 20.0 # SCHEMA VALIDATION
+20.1 # TEMPLATE ENGINE 
+
 
 
 ## NODE JS USER MANUAL
@@ -1195,3 +1197,14 @@ INDEX
 
     doc about express validator here https://express-validator.github.io/docs/
 
+20.1 # TEMPLATE ENGINE 
+
+    **For template engines express and nodejs suggest :
+        pug : https://www.npmjs.com/package/pug
+        handlebars : https://www.npmjs.com/package/handlebars
+
+    **However it is advisable to use 
+
+        nunjucks : https://mozilla.github.io/nunjucks/getting-started.html
+
+    **Since it is almost identical to Jinja2
