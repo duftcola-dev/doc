@@ -411,16 +411,21 @@ INDEX
             function AddTwo(number){
                 return number+2;
             }
+            function AddOne(number){
+                return number+1;
+            }
 
             export {
-                AddTwo
+                AddTwo,
+                AddOne
             };
 
         //index.js 
 
-            import {AddTwo} from './utils/addTwo.mjs';
+            import objects from './utils/addTwo.mjs';
 
-            console.log(AddTwo(2));
+            console.log(objects.AddTwo(2));
+            console.log(objects.AddOne(2));
 
 
         **Using {AddTwo} import the function or object itself 
@@ -440,13 +445,29 @@ INDEX
                 model: 'Fiesta',
             };
 
+            **Exporting multiple object 
             module.exports = {
                 car;
                 car2;
             }
 
+            **exporting one object 
+            module.exports=car;
+
         //index.js
-            const {car,car2} = require('./car');
+
+            **Getting objects individually
+
+                const {car,car2} = require('./car');
+
+                const {car} = require('./car');
+            
+            **Getting object into a single object 
+
+                const cars = require('./car');
+
+                console.log(cars.car);
+                console.log(cars.car2);
     
 ----------------------------------------------------------------------------------------------------------
 
