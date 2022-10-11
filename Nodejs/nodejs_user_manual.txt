@@ -99,6 +99,7 @@ INDEX
     **Install/upgrade nvm 
 
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash 
+        source ~/.bashrc
     
     **Test the installation
 
