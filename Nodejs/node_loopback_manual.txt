@@ -475,7 +475,25 @@
             
 
 8.0 # CONNECT TO POSGRESQL 
-    
+
+    8.1 # CREATE A POSGRSQL DATABASE (lol)
+
+        ** For testing purposes we will create a database:
+
+            database : test_database 
+            user : admin 
+            password : admin 
+            host : localhost 
+            port : 5432 (default posgresql port)
+
+        ** with the following table "product" and the rows :
+
+            - id int serial primary not null   ** serial = autoincrement
+            - tag varchar(20)
+            - completed boolean 
+            - date varchar(20)
+
+        
     8.1 # CREATE A NEW DATASOURCE
 
         lb4 datasource 
@@ -488,3 +506,4 @@
             - password : password 
             - database test_database
 
+9.0 # RELATIONS
