@@ -1,0 +1,199 @@
+1.0 # LOOPBACK MANUAL 
+
+    Loopback is a typescript framework meant to create 
+    model-view-controller project.
+
+2.0 # INSTALL LOOPBACK 
+
+    **requires nodejs installed.
+    sudo npm i -g @loopback/cli 
+
+3.0 # BASIC PROJECT
+    lb4 app
+    
+    **Follow the prompt were :
+        - enter the name of your app 
+        - description 
+        - root dir 
+        - select features 
+    
+    3.1 # START A PROJECT
+        ** cd into the project folfer 
+        ** start the project with :
+
+            npm start 
+    
+    3.2 # CREATE A CONTROLLER
+
+        ** create a controller 
+        lb4 controller
+
+        ** Follow the prompt where :
+            - the controller name is asked
+            - the type of controller (empty controller is the default)
+
+        ** the controller hello.controller.ts is create at 
+            src/controllers/hello.controller.ts
+
+        ** create the following view/class 
+
+            import {get} from '@loopback/rest';
+
+            export class HelloController {
+
+                @get('/hello')
+                hello():string{
+                    return "Hello world"
+                }
+            }
+
+            ** @get() is a decorator to create endpoints with the method get 
+            ** hello():string is a type script method that returns a string
+            ** run again npm start and aim for the url  http://127.0.0.1:3000/hello
+
+4.0 # HOW A LOOPBACK APP WORKS 
+
+    4.1 PROJECT DESCRIPTION 
+
+        **A loopback a is devided in :
+
+            - Controllers : 
+                Represent the api endpoints .This enpoint authenticate,validate and parse the incoming request 
+                as well as perform the call to Services and Repositories
+            
+            - Services : 
+                Provide the external interface to external services and API . This allow to invoke
+                external services without mentioning 
+            
+            - Models :
+                Models and relations for entities (request ,responses ,users,orders,products etc)
+            
+            - Repository:
+                Represents the layer between the app and the databases
+
+5.0 # CREATE A LOOPBACK APPLICATION 
+
+    **Following the previous point we will procedure to create a loopback
+    apllication
+
+    5.1 # CREATE THE APPLICATION ESQELETON 
+
+        ** create a todo list app
+
+            lb4 app 
+            ** follow the prompts
+            ** cd todo-list 
+            ** npm start
+
+
+    5.2 # CREATE MODELS TO REPRESENT YOU DATA 
+
+        ** creates models to represent tasks "todo"
+
+        lb4 model 
+
+        ** Follow the prompt options :
+
+            - model name : todo 
+            - model base class : Entity 
+            - allow free form : N 
+            - Enter model property name :
+                - id string
+                - tag string
+                - date string
+                - completed boolean 
+            
+            ** Model Todo was/were created in src/models
+
+    5.3 # CREATE A DATASOURCE 
+
+        ** Datasources are connectors to databases or even files where data is stored.
+        ** For demostration puposes we will use a json file.
+        ** Later more examples will be added on how to use databases
+
+        lb4 datasource 
+        ** follow prompt 
+            - name  db 
+            - In-memory db  (on this example only)
+            - windows local estorage in browser 
+            - full path file : ./data/db.json 
+
+        ** create a folder called data/ in the directory containing 
+            db.json containing and example of your model 
+
+            **data/db.json
+            {
+                "ids":{
+                    "Todo":5
+                },
+                "models:{
+                    "Todo":{
+                                                   
+                        }
+                    }
+                }
+            }
+    
+    5.4 CREATE A REPOSITORY 
+
+        **A repository is a layer-interface that uses the defined models to perform 
+        CRUD(create,read,update,delete) operations in your database.
+
+        lb4 repository 
+        **follow prompt 
+            - select the datasource : DbDataSource (created in previous step)
+            - select the model : Todo 
+            - select base class : DefaultCrudRepository (basic repository for CRUD operations)
+        
+        ** The  generated src/repositories/todo.repository.ts has all the functions necessary to perform
+            any crud operation
+
+    5.5 # ADD A CONTROLLER 
+
+        **The controller contains the operations defined by the API and 
+        all the bussiness logic and acts as bridge between the API rest 
+        and the models/database.
+
+        **The controller creates relations between 
+            - The model 
+            - The repository --> datasource 
+
+        lb4 controller 
+
+        ** follow prompt 
+            - controller class name : todo
+            - type of controller: REST - CRUD controller 
+            - model : Todo 
+            - repository : TodoRepository 
+            - id property : id 
+            - type of the id : string
+            - is the id omited ? No 
+            - enpoint path (Http path ): /todo
+
+        ** Controller Todo was/were created in src/controllers
+
+    5.6 # APPLICATION SUMMARY  
+
+        controller:
+            - interface between the rest-api (endpoints), repositories and models
+        repository:
+            - Bridge/interface between data source and model
+        model:
+            - representation of data
+        data-source
+            - connector / driver to database
+
+
+        graphic representation :
+                                                            --------> Datatource ----> Database
+                                                            |
+            controler (res-api) ------------> Repository-----
+                                    |                       |
+                                    ---------------------------------> Model
+
+6.0 #  MODEL RELATIONS 
+
+        **How to create models relations. For example : 
+
+            A model A that is a list in wich each element 
+            in the list is a model B
