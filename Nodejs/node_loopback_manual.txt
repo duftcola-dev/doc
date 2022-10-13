@@ -193,7 +193,24 @@
 
 6.0 #  MODEL RELATIONS 
 
-        **How to create models relations. For example : 
+        ** How to create models relations. For example : 
 
             A model A that is a list in wich each element 
             in the list is a model B
+
+        ** In the previous todo-list project add a new model 
+           that represents a list .
+
+            lb4 model 
+                - name : TodoList 
+                - model base class: Persistent model with id 
+                - allow aditional properties : No 
+            
+            TodoList properties :
+
+                - id : string 
+                - title: string 
+
+            Model TodoList se ha/han creado en src/models
+                
+
