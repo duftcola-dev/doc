@@ -184,7 +184,7 @@
             - connector / driver to database
 
 
-        graphic representation :
+        graphic representation of a loopback app:
                                                             --------> Datatource ----> Database
                                                             |
             controler (res-api) ------------> Repository-----
