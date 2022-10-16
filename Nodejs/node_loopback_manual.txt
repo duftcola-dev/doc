@@ -506,5 +506,3 @@
             - password : password 
             - database test_database
 
-
-9.0 # RELATIONS
