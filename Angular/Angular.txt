@@ -1,0 +1,94 @@
+
+
+
+
+
+1.0 # INSTALLATION 
+
+    - requires nodejs to be installed 
+    - npm install -g @angular/cli 
+    
+    1.1 # CREATE AN APP 
+
+        ng new my-app
+
+    1.2 # LAUNCH YOUR APP 
+
+        cd my-app
+        ng serve --open
+
+
+2.0 # CORE CONCEPTS 
+
+    2.1 # BUILDING BLOCKS 
+
+        ** Angular building blocks are:
+
+            - Components 
+            - Routes 
+            - Directives 
+            - Services 
+            - Modules
+
+
+
+    2.2 # COMPONENTS
+
+        Everything in angular is a component.
+        A component uses the notation component_name.component.ts .
+        A component os composed by :
+
+            - Component class 
+            - templatUrl ( the url to the html the component uses)
+            - styleUrl ( the url to css the component uses)
+
+        example : 
+
+            import { Component } from '@angular/core';
+
+            @Component({
+            selector: 'app-root',
+            templateUrl: './app.component.html',
+            styleUrls: ['./app.component.css']
+            })
+            export class AppComponent {
+            title = 'my-app';
+            }
+
+        
+        Component 
+            -------> Component class
+            -------> HTML 
+            -------> CSS 
+
+    2.3 # SERVICES 
+
+        **services are the part in Angular that handles the logic 
+
+        Component ---> button ----> service  
+
+
+    2.4 # DIRECTIVES 
+
+        ** Directives are smaller componensts that
+        create , update or alter HTML 
+
+        - Componets directives 
+        - Structure directives 
+        - Attribute directives 
+
+    2.5 # ROUTES 
+
+        **Determines what html is rendered.
+
+    
+    2.6 # MODULES 
+
+        ENCASES
+            - Components 
+            - Services 
+            - Directives 
+            - Routes 
+
+            ...etc
+        
