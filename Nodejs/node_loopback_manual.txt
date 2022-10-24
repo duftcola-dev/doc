@@ -3,10 +3,20 @@
     Loopback is a typescript framework meant to create 
     model-view-controller project.
 
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
 2.0 # INSTALL LOOPBACK 
 
     **requires nodejs installed.
     sudo npm i -g @loopback/cli 
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
 
 3.0 # BASIC PROJECT
     lb4 app
@@ -51,6 +61,11 @@
             ** hello():string is a type script method that returns a string
             ** run again npm start and aim for the url  http://127.0.0.1:3000/hello
 
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
 4.0 # HOW A LOOPBACK APP WORKS 
 
     4.1 PROJECT DESCRIPTION 
@@ -70,6 +85,11 @@
             
             - Repository:
                 Represents the layer between the app and the databases
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
 
 5.0 # CREATE A LOOPBACK APPLICATION 
 
@@ -184,16 +204,305 @@
             - connector / driver to database
 
 
-        graphic representation :
+        graphic representation of a loopback app:
                                                             --------> Datatource ----> Database
                                                             |
             controler (res-api) ------------> Repository-----
                                     |                       |
                                     ---------------------------------> Model
 
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
 6.0 #  MODEL RELATIONS 
 
-        **How to create models relations. For example : 
+        ** How to create models relations. For example : 
 
             A model A that is a list in wich each element 
             in the list is a model B
+
+        ** In the previous todo-list project add a new model 
+           that represents a list .
+
+    6.1 # CREATE THE NEW MODEL 
+
+            lb4 model 
+                - name : TodoList 
+                - model base class: Persistent model with id 
+                - allow aditional properties : No 
+            
+            TodoList properties :
+
+                - id : string 
+                - title: string 
+
+            Model TodoList se ha/han creado en src/models
+
+    6.2 # CREATE REPOSITORY
+
+        ** Create the repository in order to form the relation between the model 
+           and the datasource
+                
+            lb4 repository
+                - Select current datasource DbDatasource 
+                - Select model TodoList 
+                
+            Repository TodoListRepository se ha/han creado en src/repositories
+
+    6.3 # DEFINE MODEL RELATION
+
+        **Define a model relation between Todo  and TodoList
+        where TodoList is a buffer(array) of Todo entities.
+
+        lb4 realtion 
+            - relation type : belogns to
+            - source : Todo 
+            - target(belongs to) : TodoList 
+            - foreign key to define the relation : todoListId  ** This is just contrain id to tag the relation
+            - relation name : todoList 
+            - allow Todo queries to include data from related Todolist : yes 
+
+        Relation BelongsTo se ha/han creado en src
+
+    6.4 ADD NEW FIELDS/TABLE TO THE DATABASE
+
+        "ids":{
+            "Todo":0,
+            "TodoList":0,
+        }
+
+        "TodoList":{
+
+        }
+
+        ** Now if we check the model Todo we will see a new 
+        property : todoListId wich tells us to which TodoList belongs to 
+
+        ** Notice the belongsTo decorator in the model Todo 
+
+            @belongsTo(() => TodoList)
+            todoListId: string;
+
+    6.5 ADD A TODO LIST CONTROLLER
+
+        lb4 controller 
+
+            - CRUD controller 
+            - model: TodoList 
+            - repository : TodoListRepository 
+            - id : id 
+            - id type : string 
+            - http access : /todo-list 
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+7.0 # LOOPBACK WORKFLOW 
+
+    ** So far the loopback worklfow to add new functionalities is the following :
+
+        1 - CREATE A DATASOURCE .
+                ** This is a class that acts a connector between your databse and your app
+                lb4 datasource
+                ** Datasource only
+            
+        2 - CREATE MODEL 
+                lb4 model
+                ** This is the representation of your data 
+        
+        3 - CREATE RELATIONS 
+                lb4 relation
+                ** If there are models relatedto eachouther create relations 
+        
+        4 - CREATE REPOSITORIES FOR EACH MODEL 
+                lb4 repository
+                ** A repository relates each model to the datasource
+                effectively allowin the model to interact with the database 
+
+        5 - CREATE CONTROLLERS :
+                lb4 controller
+                ** Controllers contain the busssiness logic and the reltion between 
+                the models , the rest api and the repositories
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+7.0 # CREATING ARRAY MODELS 
+
+    ** So far the looback workflow for adding new functionalities is the following 
+    ** Lets create an model called TodoCsv .
+    ** TodoCsv is and array in which each item is a Todo model instance
+
+    lb4 model 
+
+        - type Entity with ID 
+        - additional entities : no 
+        - id (autogenerated) : string 
+        - tag : string 
+        - items : array
+
+    7.1 # CREATE REPOSITORY
+
+        lb4 repository
+            - select datasource 
+            - select model 
+    
+    7.2 # ADD TABLE/DATA REPRESENTATION TO DATABASE 
+
+        ** for this example we use  data/db.json 
+        ** so far our database looks like this
+        {
+            "ids": {
+                "Todo": 0,
+                "TodoList": 0,
+                "TodoCsv":0
+            },
+            "models": {
+                "Todo": {
+     
+                    },
+                "TodoList": {
+     
+                    },
+                "TodoCsv":{
+      
+                    }
+            }
+        }
+
+    7.3 # CREATE CONTROLLER 
+
+        ** Create the controller for TodoCsv 
+        lb4 controller
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+8.0 # SETTING SERVER CONFIGURATION
+
+    ** The configuration of the application server can be set at 
+       src/index.ts in : 
+
+        sintaxis:
+        
+        const config={
+            rest:{
+                param : value
+            }
+        }
+
+        ** This is the default configuration
+        const config = {
+            rest: {
+                port: +(process.env.PORT ?? 3000),
+                host: process.env.HOST,
+                gracePeriodForClose: 5000, // 5 seconds
+                openApiSpec: {
+                    setServersFromRequest: true,
+                },
+            },
+        };
+
+        ** Some of the parameters that can be used are 
+
+            - port : app port  (default 3000) interger
+            - host : server host (default localhost) string 
+
+            - protocol : "http" 
+
+                ** It can be "http" or "https" but https requires to have a key and a cert 
+
+            - gracePeriodForClose: 5000 
+
+                ** Is the time the server waits in-flight requests to finish before 
+                   closing the socker. Basically the request time out. 
+                   By default there is no timeout
+
+            - apiExporer: {
+                        url:"https://explorer.loopback.io" ,
+                        httpUrl:"http://explorer.loopback.io",
+                        disable:False
+                    }
+
+                ** apiExplorer allows to use a UI in order to visualize the 
+                   the rest api 
+                ** start your server and follow localhost:3000/explorer 
+                ** It ca be disable setting desable:
+                
+
+            - cors :{
+                    origin: '*',
+                    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+                    preflightContinue: false,
+                    optionsSuccessStatus: 204,
+                    maxAge: 86400,
+                    credentials: true,
+                    }
+
+                ** For information about cors visit https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+
+            - expressSettings: {
+                'x-powered-by': false,
+                env: 'production',
+                ...
+                }
+
+                ** override the default express setting 
+                ** more info about express default settings here : http://expressjs.com/fr/api.html#app.set
+
+            - basePath: '/api', 
+
+                ** Instead of localhost:3000/ now you app needs to be accessed using
+                localhost:3000/api/
+
+            - requestBodyParser: {
+                    json: {
+                        limit: '1mb'}
+                        }
+                
+                ** Sets a limit of 1mb of the data incoming in the body
+
+            - key : private SSL key for https 
+            - cert : specific SSL key for https
+            
+
+8.0 # CONNECT TO POSGRESQL 
+
+    8.1 # CREATE A POSGRSQL DATABASE (lol)
+
+        ** For testing purposes we will create a database:
+
+            database : test_database 
+            user : admin 
+            password : admin 
+            host : localhost 
+            port : 5432 (default posgresql port)
+
+        ** with the following table "product" and the rows :
+
+            - id int serial primary not null   ** serial = autoincrement
+            - tag varchar(20)
+            - completed boolean 
+            - date varchar(20)
+
+        
+    8.1 # CREATE A NEW DATASOURCE
+
+        lb4 datasource 
+            - datasource name : PosgresDb 
+            - conenctor  PostgreSQL 
+            - connection string url to override other settings 
+            - host: localhost 
+            - 5432 
+            - user
+            - password : password 
+            - database test_database
+
