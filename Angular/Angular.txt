@@ -34,17 +34,13 @@
             - Services 
             - Modules
 
-
-
     2.2 # COMPONENTS
 
-        Everything in angular is a component.
-        A component uses the notation component_name.component.ts .
-        A component os composed by :
-
-            - Component class 
-            - templatUrl ( the url to the html the component uses)
-            - styleUrl ( the url to css the component uses)
+        A component is made of :
+    
+            - templateUrl : links the component with its HTML view
+            - styleUrls : links view with its style
+            - class : contains the logic of the component
 
         example : 
 
@@ -59,21 +55,32 @@
             title = 'Hello World';
             }
 
-        **In our html we can see the injection of the component in
-        index.html
+        ** Notice Component is a decorator from the @angular/core
+        ** Components use the notation : 
 
-        </head>
-        <body>
-        <app-root>{{title}}</app-root>
-        </body>
-        </html>
+            component_name.compoments.ts
+
+    2.3 # MODULES 
+
+        **Modules allow the agrupation of components
+        **Module use the notation:
+
+            module_name.module.ts
         
-        **Notice {{}} is used for content injection
-        **It can also inject logic --> {{ 1 + 1}} **will render 2
-        Component 
-            -------> Component class
-            -------> HTML 
-            -------> CSS 
+        **Every module is composed by the following fields :
+
+            delcarations: Contains components
+            imports: Contain other modules 
+            providers: ? 
+            bootstrap: It is the root component the application launches ?? 
+            exports: Contains the compoments whose template(html) we want
+                     to make available for other modules
+
+        example:
+
+            
+        
+
 
     2.3 # SERVICES 
 
@@ -147,3 +154,18 @@
     - polifills : allows compatibility with other browsers 
     - style.css : global css style 
     - test.ts: test configuration
+
+ # CREATING COMPONENTS WITH THE CLI
+
+    ** By default angular already creates the compononents
+    inside src/app
+
+    ng generate component .component_name 
+
+    ** short version 
+
+    ng g c component_name 
+
+    example: 
+
+        ng g c listado  ---> will generate ListadoComponent
