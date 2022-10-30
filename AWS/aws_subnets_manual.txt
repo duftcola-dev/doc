@@ -1,0 +1,88 @@
+HOW TO CREATE PUBLIC AND PRIVATE SUBNETS
+
+
+1.0 # INTRO
+
+**A virtual private cloud allows us to access our resource in the cloud
+**There is always a VPC by default.
+**A subnet is a range of Ips inside our VPC
+
+**We must create in our VPC a:
+
+    - public subnet accessible by users 
+    - private subnet only accessible by us
+
+----------------------------------------------------------------------------
+
+2.0 # CREATE A VPC 
+
+AWS ---> VPC ---> VPC DASHBOARD ---> CREATE VPC
+
+    - Set a name tag of your vpc 
+    - Set the IPV4 CIDR manual input 
+    - Set the IPV4 CIDR 
+    - Set tenancy (default) (only used for instances that require deicated resources)
+    ---> Create vpc
+        
+    ** Use a CIDR calculator on the interner to have more control 
+        and know the total number of hosts.
+    ** Remember that AWS always takes 2 host for itself so your CIDR 
+        block must have at leat +1(-2) hosts
+
+        example: 10.0.0.0/16 
+    
+    ** IP range goes from 10.0.0.0 to  10.0.255.255
+    ** Will have 4 hosts -2 therefore 2 hosts in total.
+    ** AWS only allows VPC between /28 and /16
+
+----------------------------------------------------------------------------
+
+3.0 # CREATE A SUBNET
+    
+    3.1 # CREATING SUBNETS
+
+    AWS ---> VPC --> SUNETS ---> create subnet 
+
+    - Associate your VPC 
+    - Set a subnet tag name (exaple : my-private-subnet)
+    - Select availavility zone
+    - Select IPv4 CIDR block :v 10.0.0.0/24 (our ip range goes from 10.0.0.0 to 10.0.255.255)
+    - Create another subnet :
+    - Set a subnet name : my-public-subnet 
+    - set IPV4 : 10.0.1.0/24
+
+    3.2 # ADDING ACCESS TO INTERNET WITH INTERNET GATEWAY
+
+    - We will give access to internet to our public-subnet.
+    AWS--> VPC -->internet gateway--> create internet gateway
+    - Associate your internet gateway to your VPC --> actions --> attach to VPC
+    - Go to your public-subnet --> add new route in route tables
+    - Edit routes --> destination 10.0.0.0 --> target my iternet gateway
+
+    finally
+    - Add the new route table with the internet gateway to the public subnet:
+        ---> VPC --> routes tables --> internet gateway-route ---> subnet associatios
+        --> edit subnet associations --> add public subnet
+
+    3.3 # ASSING AUTO IP 
+
+    --> subnet settings --> actions --> sedit subnet settings ---> set autoassign ip
+    
+----------------------------------------------------------------------------
+
+4.0 # CREATE AN ACL
+
+    ** Defines a set of rules who is allowed to in 
+    and out in our subnet.
+
+    4.1 # INBOUND RULES 
+
+        ** Input rules 
+
+    4.2 # OUTBOUND RULES 
+
+        ** Output rules 
+
+    4.3 # ASSOCIATED SUBNETS 
+
+        ** the subnet upon which this  rules will apply
