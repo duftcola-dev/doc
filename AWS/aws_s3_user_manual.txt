@@ -1,0 +1,71 @@
+
+AWS S3
+
+1.0 # CREATING CREDENTIALS 
+
+    - configure your aws cli 
+
+2.0 # CREATING A BUCKER 
+
+    AWS--> S3 --> Create bucket
+     - name tag bucket 
+     - enabled ACLS so only users in IAM can access your bucket
+     - block all public access 
+
+3.0 # AWS CLI BASIC COMMANDS 
+
+    3.1 # CREATE A BUCKET
+
+        sudo aws s3 mb s3://buclet-name 
+
+    3.2 # LIST BUCKETS 
+
+        sudo aws s3 ls 
+
+        ** list object inside a bucket 
+
+        sudo aws s3 ls s3://bucket-name 
+
+        ** list object inside folder
+        
+        sudo aws s3 ls s3://bucket-name/folder
+
+    3.3 # DELETE BUCKET 
+
+        sudo aws s3 rb s3://buket-name 
+
+        ** Delete bucket and all object inside it 
+
+        sudo aws s3 rb s3://bucket-name --force
+
+    3.4 # DELETE OBJECT IN BUCKET 
+
+        sudo aws s3 rm s3://bucker-name/object_name
+
+    3.5 # UPLOAD DOWNLOAD OBJECT 
+
+            sudo aws s3 mv source target 
+
+        **upload 
+
+            sudo aws s3 mv users.csv s3://bucket-name 
+
+        **dowload 
+
+            sudo aws s3 mv s3://bucket-name/users.csv ./users
+
+        ** move from s3 bucket to other s3 BUCKET
+
+            sudo aws s3 mv s3://bucket-name s3://other-bucket
+
+    3.6 # SYNC FILES 
+
+        ** Allows to mantain the same files in local folder and the bucket 
+        ** Missing files will be copied by defauly 
+        ** In order to sync with delete use the --delete flag 
+
+            sudo aws s3 sync ./users s3://my-bucket 
+
+        ** sync with delete 
+
+            sudo aws s3 sync ./users s3://my-bucket --delete
