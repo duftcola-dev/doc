@@ -1,0 +1,135 @@
+BITBUCKET USET MANUAL 
+
+1.0 # BASIC ORGANIZATION
+
+    **To create a bitbucket pipeline create bitbucket-pipeline.yml
+    file in your project repository.
+
+    1.1 # BASIC CONFIGURATION
+
+        image: node:18.10.0  ** Language version
+
+
+        pipelines:
+
+            - variables:
+                - name: UserName  ** var name
+                  default: "Robin" ** var default value
+                - name: Region
+                  default: "eu-west-3"
+                  allowed-values:        ** Restrict the variable posible values
+                    - "ue-virginia-west",
+                    - "eu-west-3"
+
+            default: ** Runs for any branch that doesnt match any previous pattern
+                - step:
+                    name: Step default ** Step tags
+                    runs-on: 
+
+                    script: 
+                        - echo 'hello $UserName' ** Using a variable
+
+            branches: ** Runs for every push of the branch staging
+                - staging
+                    - step:
+                        script:
+                            -...
+
+            pull-requests: ** Triggered only during pull request
+                '**': ** Runs for any branch
+                    - step:
+                        script:
+                            -...
+
+                feature/*: ** Runs for any branch that starts with feature
+                    - step:
+                        script
+                            - ...
+                master: ** Only for branch master
+                    - stage:
+                        name: Pushing to master
+                        steps:                      **stages allow us to group steps
+                            - step:
+                                name: Build app 
+                                script:
+                                    - sh ./build-app.sh
+                            - step:
+                                name: Build app 
+                                script:
+                                    - sh ./build-app.sh
+
+                            - step:
+                                name: Build app 
+                                script:
+                                    - export MY_FLAG=true
+                                    - |
+                                    if [ "$MYFLAG" = true ]; then
+                                        node -v
+                                    fi
+                                    - if [ "$BITBUCKET_WORKSPACE" != test ]; then exit 0 ; fi 
+                                    - pipe: atlassian/aws-s3-deploy:0.2.4     
+            tags:                   - if [ "$BITBUCKET_EXIT_CODE" != 0 ]; then exit 1 ; fi 
+
+            bookmarks:
+
+            pull requests:
+
+            custom: 
+                - variables
+
+2.0 # VARIABLES AND SECRETS
+
+    ** Variables are usually declared at the beggining of the pipeline
+    ** Variables can have a default value 
+    ** Variables can have a range of restricted values 
+    ** The value of a variable can be invoked using $variable_name
+
+
+     pipelines:
+            - variables:
+                - name: UserName  ** var name
+                  default: "Robin" ** var default value
+                - name: Region
+                  default: "eu-west-3"
+                  allowed-values:        ** Restrict the variable posible values
+                    - "ue-virginia-west",
+                    - "eu-west-3"
+
+#  Template NodeJS build
+
+#  This template allows you to validate your NodeJS code.
+#  The workflow allows running tests and code linting on the default branch.
+
+image: node:18-alpine
+
+pipelines:
+  default:
+      - step:
+          name: "Running test with mocka"
+          script:
+            - export NODE_ENV=test 
+            - npm install
+            - npm test
+  branches:
+    development:
+      - step:
+          name: "Installing deppendencies"
+          script:
+            - npm install
+      - step:
+          name: "Setting environment"
+          script: 
+            - export NODE_ENV=dev 
+      - step:
+          name: "Launching app" 
+          script:
+            - npm start
+      - step:
+          name: "Executing coverage" 
+          script:
+            - npm coverage 
+      - step:
+          name: "Sending notification"
+          script:
+            - if [ "$BITBUCKET_EXIT_CODE" != 0 ]; then exit echo "something went wrong" ; fi
+            - if [ "$BITBUCKET_EXIT_CODE" = 0 ]; then exit echo "Everithing went smooth" ; fi
