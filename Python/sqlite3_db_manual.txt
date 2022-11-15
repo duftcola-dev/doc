@@ -7,7 +7,8 @@ SQLITE3
 # CREATE AN SQLIT3 DATABSE 
 
     *in console
-    sqlite3 database_name.bd 
+    sqlite3 database_name.db
+     
     
 # CREATE DATABASE WITH INIT FILE 
 
