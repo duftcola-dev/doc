@@ -95,6 +95,10 @@
 
     sudo -u user_name psql -d database_name
 
+    2.1 # ACCESS FROM INSIDE A DOCKER CONTAINER
+
+        psql -h localhost -U user_name -d database_name
+
 3.0 # BASIC COMMANDS 
 
     **when logged access the posgresql console with :
@@ -116,4 +120,4 @@
 
     exit : exits  posgresql user role.
 
-    
+
